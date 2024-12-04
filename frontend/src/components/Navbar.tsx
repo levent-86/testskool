@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
-import { Button, IconButton, useColorScheme, Box, Link, Stack, Tooltip, Avatar, Menu, MenuItem, ListItemIcon, Divider, useMediaQuery, useTheme } from '@mui/material';
-import { DarkMode, LightMode, PersonAdd, Settings, Help, Logout, Login, Menu as MenuIcon } from '@mui/icons-material';
+import {
+  Button, IconButton, useColorScheme,
+  Box, Link, Stack, Tooltip, Avatar,
+  Menu, MenuItem, ListItemIcon, Divider,
+  useMediaQuery, useTheme
+} from '@mui/material';
+import {
+  DarkMode, LightMode, PersonAdd,
+  Settings, Help, Logout, Login,
+  Menu as MenuIcon, LinkedIn
+} from '@mui/icons-material';
 import { NavbarDrawer } from './navbar/NavbarDrawer';
 
 
@@ -160,6 +169,18 @@ export const Navbar: React.FC = () => {
                   </MenuItem>
                 </Link>
 
+                <Link
+                  href='https://www.linkedin.com/in/mustafaleventfidanci/'
+                  underline="none" color="inherit" target="_blank"
+                >
+                  <MenuItem onClick={handleClose}>
+                    <ListItemIcon>
+                      <LinkedIn fontSize="small" />
+                    </ListItemIcon>
+                    Visit me on LinkedIn
+                  </MenuItem>
+                </Link>
+
                 <Divider />
                 <MenuItem onClick={handleClose}>
                   <ListItemIcon>
@@ -171,7 +192,7 @@ export const Navbar: React.FC = () => {
             </>
             :
             !isMobile &&
-            
+
             /* Show login/register button if not logged in */
             <>
               <Button
@@ -213,6 +234,18 @@ export const Navbar: React.FC = () => {
                         <Help fontSize="small" />
                       </ListItemIcon>
                       F.A.Q.
+                    </MenuItem>
+                  </Link>
+
+                  <Link
+                    href='https://www.linkedin.com/in/mustafaleventfidanci/'
+                    underline="none" color="inherit" target="_blank"
+                  >
+                    <MenuItem onClick={handleClose}>
+                      <ListItemIcon>
+                        <LinkedIn fontSize="small" />
+                      </ListItemIcon>
+                      Visit me on LinkedIn
                     </MenuItem>
                   </Link>
 

@@ -47,6 +47,9 @@ INSTALLED_APPS = [
 
     # https://www.django-rest-framework.org/#installation
     "rest_framework",
+
+    # https://pypi.org/project/django-cors-headers/
+    "corsheaders",
 ]
 
 MIDDLEWARE = [
@@ -57,6 +60,10 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    # https://pypi.org/project/django-cors-headers/
+    "corsheaders.middleware.CorsMiddleware",
+    "django.middleware.common.CommonMiddleware",
 ]
 
 # https://www.django-rest-framework.org/#example
@@ -66,6 +73,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ]
 }
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+    "http://localhost:5173",
+    "http://127.0.0.1:8000",
+]
+
+CCORS_ALLOW_ALL_ORIGINS = False
 
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-user-model
 AUTH_USER_MODEL = 'testskool.User'
@@ -119,6 +134,29 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+# Caching settings
+# https://docs.djangoproject.com/en/5.1/topics/cache/#local-memory-caching
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'testskool-cache',
+    }
+}
+
+# DRF throttling setting
+# https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy
+REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '180/minute',
+        'user': '180/minute'
+    }
+}
 
 
 # Internationalization

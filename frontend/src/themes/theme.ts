@@ -55,13 +55,25 @@ const theme = createTheme({
     // Typography
     MuiTypography: {
       styleOverrides: {
+        // Responsive typography sizes
         h4: {
-          // Responsive typography sizes
           '@media (min-width:600px)': {
             fontSize: '1.7rem',
           },
           '@media (min-width:900px)': {
             fontSize: '2.1rem',
+          },
+        },
+
+        h3: {
+          '@media (max-width:600px)': {
+            fontSize: '2.1rem',
+          },
+          '@media (min-width:600px)': {
+            fontSize: '2.1rem',
+          },
+          '@media (min-width:900px)': {
+            fontSize: '3rem',
           },
         }
       }

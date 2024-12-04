@@ -42,6 +42,7 @@ it('Visibility - Should render Login/Register elements when clicked.', async () 
   await user.click(loginRegisterButton);
   expect(screen.getByRole('link', { name: 'Login' })).toBeTruthy();
   expect(screen.getByRole('link', { name: 'Register' })).toBeTruthy();
+  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
 });
 
 
@@ -73,6 +74,7 @@ it('Visibility - Should render Profile button elements when access token provide
   expect(screen.getByRole('link', { name: 'My Profile' })).toBeTruthy();
   expect(screen.getByRole('link', { name: 'F.A.Q.' })).toBeTruthy();
   expect(screen.getByRole('menuitem', { name: 'Logout' })).toBeTruthy();
+  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
 });
 
 
@@ -157,6 +159,10 @@ it('Routing - Should route to the related routes when clicked to the Login/Regis
   const faq = await screen.findByRole('link', { name: 'F.A.Q.' });
   await user.click(faq);
   expect(window.location.pathname).toBe('/faq');
+
+  // LinkedIn link
+  user.click(loginRegisterDropdown);
+  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
 });
 
 
@@ -189,6 +195,10 @@ it('Routing - Should route to the related routes when clicked to the Profile but
   await waitFor(() => {
     expect(window.location.pathname).toBe('/faq');
   });
+
+  // LinkedIn link
+  await user.click(userDropdown);
+  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
 });
 
 
@@ -368,6 +378,13 @@ it('Res. routing - Should route to the related routes of the main elements of dr
   // Students link
   fireEvent.click(screen.getByRole('link', { name: 'Students' }));
   expect(window.location.pathname).toBe('/students');
+
+  // F.A.Q: link
+  fireEvent.click(screen.getByRole('link', { name: 'F.A.Q.' }));
+  expect(window.location.pathname).toBe('/faq');
+
+  // LinkedIn: link
+  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
 });
 
 

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // Import components
 import { Navbar } from './components/Navbar';
+import { AlertMessages } from './components/AlertMessages';
 
 // Import pages
 import Home from './pages/Home';
@@ -19,6 +20,7 @@ function App() {
   return (
     <>
       <Router>
+        <AlertMessages />
         <Routes>
           {/* Navbar pages */}
           <Route element={<Navbar />}>

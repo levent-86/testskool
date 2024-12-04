@@ -1,6 +1,14 @@
 #!/bin/bash
 set -e # Exit immediately if a command exits with a non-zero status.
 
+# Create .env file in backend folder
+if [ ! -f /app/backend/backend/.env ]; then
+    echo "SECRET_KEY=some-secret-key" > /app/backend/backend/.env
+    echo "Created .env file with SECRET_KEY"
+else
+    echo ".env file already exists"
+fi
+
 # Run makemigrations and migrate commands
 python manage.py makemigrations
 python manage.py migrate
