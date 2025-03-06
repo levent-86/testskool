@@ -17,31 +17,30 @@ from django.core.cache import cache
     }
 )
 class RegisterViewTest(APITestCase):
-    """ Register view tests """
-
+    # Register view tests
 
     # Provide data for test
     def setUp(self):
         cache.clear()
-        self.subject = Subject.objects.create(name="Math")
-        self.subject = Subject.objects.create(name="Art")
         self.url = reverse('register')
+        Subject.objects.create(name="Math")
+        Subject.objects.create(name="Art")
 
     # Test case is when username is not provided
-    def test_register_missing_username(self):
+    def test_register_missing_username_request(self):
         data = {
             "username": "",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Math"],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Missing username should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_412_PRECONDITION_FAILED)
-        self.assertIn("Please provide a username.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("This field may not be blank.", response.data['username'])
 
 
     # Test case is when username includes space character
@@ -50,14 +49,14 @@ class RegisterViewTest(APITestCase):
           "username": "john doe",
           "password": "12345678",
           "confirm": "12345678",
-          "isTeacher": False,
+          "is_teacher": False,
           "Subject": []
         }
         response = self.client.post(self.url, data, format="json")
 
         # Space character should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_412_PRECONDITION_FAILED)
-        self.assertIn("Space is not allowed on username.", response.data["message"])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Enter a valid username. This value may contain only letters, numbers, and @/./+/-/_ characters.", response.data["username"])
 
 
     # Test case is when username is already exists
@@ -68,15 +67,15 @@ class RegisterViewTest(APITestCase):
             "username": "existing_user",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Math"],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Existing user should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-        self.assertIn("This username is already exists.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("A user with that username already exists.", response.data['username'])
 
 
     # Test case is when password is NOT provided
@@ -85,15 +84,15 @@ class RegisterViewTest(APITestCase):
         "username": "missing_password_user",
         "password": "",
         "confirm":"12345678",
-        "isTeacher": False,
+        "is_teacher": False,
         "subject": [],
       }
 
       response = self.client.post(self.url, data, format="json")
 
       # Missing password should show error message with status code
-      self.assertEqual(response.status_code, status.HTTP_412_PRECONDITION_FAILED)
-      self.assertIn("Please provide a password.", response.data["message"])
+      self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+      self.assertIn("This field may not be blank.", response.data["password"])
 
 
     # Test case is when password is short than 8 characters
@@ -102,15 +101,15 @@ class RegisterViewTest(APITestCase):
             "username": "short_password_user",
             "password": "1234567",
             "confirm": "1234567",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Math"],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Short password should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_412_PRECONDITION_FAILED)
-        self.assertIn("Password must be at least 8 characters.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Password must be at least 8 characters.", response.data['password'])
 
 
     # Test case is when password and confirmation are NOT match
@@ -119,15 +118,15 @@ class RegisterViewTest(APITestCase):
             "username": "mismatch_password_user",
             "password": "12345678",
             "confirm": "01234567",
-            "isTeacher": False,
+            "is_teacher": False,
             "subject": [],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Password and confirmation mismatch should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_417_EXPECTATION_FAILED)
-        self.assertIn("Password and confirmation didn't match.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Password and confirmation must match.", response.data['confirm'])
 
 
     # Test case is when user role is not a boolean
@@ -136,15 +135,15 @@ class RegisterViewTest(APITestCase):
             "username": "role_not_boolean_user",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": "string",
+            "is_teacher": "string",
             "subject": [],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Non-boolean user role should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_417_EXPECTATION_FAILED)
-        self.assertIn("Choose one field: student or teacher.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Must be a valid boolean.", response.data['is_teacher'])
 
 
     # Test case is when a teacher trying to register without subject
@@ -153,15 +152,15 @@ class RegisterViewTest(APITestCase):
             "username": "teacher_without_subject",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": [],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Teacher role without subject should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_417_EXPECTATION_FAILED)
-        self.assertIn("Please select your subject(s) (ex: \"Math\", \"Art\" ...).", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Please select your subject(s).", response.data['subject'])
 
 
     # Test case is when a teacher has an invalid subject
@@ -170,41 +169,41 @@ class RegisterViewTest(APITestCase):
             "username": "teacher_with_invalid_subject",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Non Existing Subject"],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Teacher role with invalid subject should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_417_EXPECTATION_FAILED)
-        self.assertIn("Please select your subject(s) (ex: \"Math\", \"Art\" ...).", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Please select your subject(s).", response.data['subject'])
 
 
     # Test case is when a student trying to register with a subject
     def test_register_student_with_subject(self):
         data = {
-            "username": "student_with_subject",
+            "username": "student-with-subject",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": False,
+            "is_teacher": False,
             "subject": ["Math"],
         }
 
         response = self.client.post(self.url, data, format='json')
 
         # Student role with subject should show error message with status code
-        self.assertEqual(response.status_code, status.HTTP_417_EXPECTATION_FAILED)
-        self.assertIn("Only teachers can choose a subject.", response.data['message'])
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("Only teachers can choose a subject.", response.data['subject'])
 
 
     # Test case is registering a valid teacher
     def test_register_valid_teacher(self):
         data = {
-            "username": "teacher_user",
+            "username": "teacher-user",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Math"],
         }
 
@@ -215,16 +214,16 @@ class RegisterViewTest(APITestCase):
         self.assertIn("Account registered successfully. You are ready to log in!", response.data['message'])
 
         # Check if teacher is registered
-        self.assertTrue(get_user_model().objects.filter(username="teacher_user").exists())
+        self.assertTrue(get_user_model().objects.filter(username="teacher-user").exists())
 
 
     # Test case is registering a valid teacher with multi subject
     def test_register_valid_teacher_multi_subject(self):
         data = {
-            "username": "teacher_user_with_multi_subject",
+            "username": "teacher-user-with-multi-subject",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": True,
+            "is_teacher": True,
             "subject": ["Math", "Art"],
         }
 
@@ -235,7 +234,7 @@ class RegisterViewTest(APITestCase):
         self.assertIn("Account registered successfully. You are ready to log in!", response.data['message'])
 
         # Check if teacher is registered
-        self.assertTrue(get_user_model().objects.filter(username="teacher_user_with_multi_subject").exists())
+        self.assertTrue(get_user_model().objects.filter(username="teacher-user-with-multi-subject").exists())
 
 
     # Test case is registering a valid student
@@ -244,7 +243,7 @@ class RegisterViewTest(APITestCase):
             "username": "student_user",
             "password": "12345678",
             "confirm": "12345678",
-            "isTeacher": False,
+            "is_teacher": False,
             "subject": [],
         }
 

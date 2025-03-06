@@ -1,8 +1,8 @@
 import { createTheme } from '@mui/material/styles';
 import { fonts } from './fonts';
+import { darkMode, lightMode } from './colors';
 
 const theme = createTheme({
-
   breakpoints: {
     values: {
       xs: 0,
@@ -15,8 +15,12 @@ const theme = createTheme({
 
   // Dark theme
   colorSchemes: {
-    light:true,
-    dark: true,
+    light: {
+      ...lightMode
+    },
+    dark: {
+      ...darkMode
+    },
   },
 
   cssVariables: {
@@ -26,12 +30,12 @@ const theme = createTheme({
   // Fonts
   typography: {
     fontFamily: fonts.body,
-    h1: {fontFamily: fonts.heading},
-    h2: {fontFamily: fonts.heading},
-    h3: {fontFamily: fonts.heading},
-    h4: {fontFamily: fonts.heading},
-    h5: {fontFamily: fonts.heading},
-    h6: {fontFamily: fonts.heading},
+    h1: { fontFamily: fonts.heading },
+    h2: { fontFamily: fonts.heading },
+    h3: { fontFamily: fonts.heading },
+    h4: { fontFamily: fonts.heading },
+    h5: { fontFamily: fonts.heading },
+    h6: { fontFamily: fonts.heading },
   },
 
   // Components
@@ -76,6 +80,23 @@ const theme = createTheme({
             fontSize: '3rem',
           },
         }
+      }
+    },
+
+    MuiDrawer: {
+      styleOverrides: {
+        paper: ({ theme }) => ({
+          backgroundColor: theme.palette.mode === 'dark' ? '#070c12' : '#edf2f8',
+          color: theme.palette.mode === 'dark' ? 'rgb(221, 233, 243)' : 'rgb(12, 24, 34)'
+        })
+      }
+    },
+    MuiMenu: {
+      styleOverrides: {
+        paper: ({ theme }) => ({
+          backgroundColor: theme.palette.mode === 'dark' ? '#070c12' : '#edf2f8',
+          color: theme.palette.mode === 'dark' ? 'rgb(221, 233, 243)' : 'rgb(12, 24, 34)'
+        })
       }
     }
   },

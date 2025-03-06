@@ -1,13 +1,52 @@
-import { Link } from '@mui/material';
+import { Box, Stack, Typography, Button, Link } from '@mui/material';
+import { Link as RouterLink } from 'react-router-dom';
+import { LinkedIn, GitHub, QuestionMark } from '@mui/icons-material';
 
 const NoPage: React.FC = () => {
-    return <>
-    <h1>404</h1>
-    <h1>PAGE NOT FOUND</h1>
-    <p>Oops, it seems you&apos;re lost! Perhaps you&apos;ve taken a wrong turn. You can {' '}
-    <Link href="/"> navigate to the homepage </Link>{' '}
-    to continue your journey.</p>
-    </>;
+  return <>
+    <Box
+      sx={{
+        width: '100%',
+        height: '100vh',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+      <Stack direction='column' alignItems='center' spacing={5}>
+        <Typography variant="h1">
+          404
+        </Typography>
+        <Typography>
+          Sorry, Page Not Found.
+        </Typography>
+        <Button variant="contained" component={RouterLink} to="/">To Home Page</Button>
+
+        <Stack direction='row' alignItems='center' spacing={5}>
+          <Link
+            href='https://www.linkedin.com/in/mustafaleventfidanci/'
+            underline="none" target="_blank" color='inherit'
+          >
+            <LinkedIn fontSize="large" />
+          </Link>
+
+          <Link
+            href='https://www.github.com/levent-86/'
+            underline="none" target="_blank" color='inherit'
+          >
+            <GitHub fontSize="large" />
+          </Link>
+
+          <Link
+            component={RouterLink}
+            to='/faq'
+            underline="none" color='inherit'
+          >
+            <QuestionMark fontSize="large" />
+          </Link>
+        </Stack>
+      </Stack>
+    </Box>
+  </>;
 };
 
 export default NoPage;

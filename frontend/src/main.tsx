@@ -6,9 +6,9 @@ import theme from './themes/theme.ts';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-  <ThemeProvider theme={theme} defaultMode='system'>
-    <CssBaseline />
-    <App />
-  </ThemeProvider>
+    <ThemeProvider theme={theme} defaultMode='system'>
+      <CssBaseline />
+      <App />
+    </ThemeProvider>
   </StrictMode>,
 );

@@ -9,6 +9,7 @@ class User(AbstractUser):
     subject = models.ManyToManyField("Subject", blank=True, related_name="teachers_set")
     is_teacher = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
+    profile_picture = models.ImageField(upload_to="profile-pictures", blank=True, null=True)
 
     def __str__(self):
         return self.username

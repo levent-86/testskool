@@ -5,12 +5,10 @@ import api from '../services/api';
 import { Snackbar, SnackbarCloseReason, Alert } from '@mui/material';
 
 export const AlertMessages: React.FC = () => {
-  // States
   const [message, setMessage] = useState<string>('');
   const [severity, setSeverity] = useState<boolean>(false);
   const [snackOpen, setSnackOpen] = useState<boolean>(false);
 
-  // Alert handler
   const handleClose = (
     _event?: React.SyntheticEvent | Event,
     reason?: SnackbarCloseReason,
@@ -25,7 +23,6 @@ export const AlertMessages: React.FC = () => {
   // Axios interceptor for after response to handle error / success messages
   api.interceptors.response.use(
     (response) => {
-      // Set success messages
       if (response.data?.message) {
         setSeverity(true);
         setMessage(response.data.message);
@@ -34,7 +31,6 @@ export const AlertMessages: React.FC = () => {
       return response;
     },
 
-    // Set error messages
     (error) => {
       // Throttling message
       if (error.response?.status === 429) {
@@ -43,9 +39,9 @@ export const AlertMessages: React.FC = () => {
         setSnackOpen(true);
 
         // Other messages
-      } else if (error.response?.data?.message) {
+      } else if (error.response?.data) {
         setSeverity(false);
-        setMessage(error.response.data.message);
+        setMessage(error.response?.data?.detail || error.response.data.message || error.message);
         setSnackOpen(true);
 
       } else {
@@ -58,16 +54,16 @@ export const AlertMessages: React.FC = () => {
   );
 
   return <>
-    {/* Alert */}
     <Snackbar
       open={snackOpen}
       autoHideDuration={10000}
       onClose={handleClose}
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
     >
       <Alert
         onClose={handleClose}
         severity={severity ? 'success' : 'error'}
+        variant='filled'
       >
         {message}
       </Alert>

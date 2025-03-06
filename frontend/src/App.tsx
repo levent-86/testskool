@@ -1,8 +1,11 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { AccessTokenProvider } from './contexts/AccessProvider';
+import { UserDataProvider } from './contexts/UserProvider';
 
 // Import components
 import { Navbar } from './components/Navbar';
 import { AlertMessages } from './components/AlertMessages';
+import { TokenRefresher } from './components/TokenRefresher';
 
 // Import pages
 import Home from './pages/Home';
@@ -20,23 +23,28 @@ function App() {
   return (
     <>
       <Router>
-        <AlertMessages />
-        <Routes>
-          {/* Navbar pages */}
-          <Route element={<Navbar />}>
-            <Route index element={<Home />} />
-            <Route path="teachers" element={<Teachers />} />
-            <Route path="students" element={<Students />} />
-            <Route path="my-profile" element={<MyProfile />} />
-            <Route path="create-quiz" element={<CreateQuiz />} />
-            <Route path='login' element={<Login />} />
-            <Route path='register' element={<Register />} />
-            <Route path='faq' element={<Faq />} />
-          </Route>
+        <AccessTokenProvider>
+          <UserDataProvider>
+            <TokenRefresher />
+            <AlertMessages />
+            <Routes>
+              {/* Navbar pages */}
+              <Route element={<Navbar />}>
+                <Route index element={<Home />} />
+                <Route path="teachers" element={<Teachers />} />
+                <Route path="students" element={<Students />} />
+                <Route path="my-profile" element={<MyProfile />} />
+                <Route path="create-quiz" element={<CreateQuiz />} />
+                <Route path='faq' element={<Faq />} />
+                <Route path='login' element={<Login />} />
+                <Route path='register' element={<Register />} />
+              </Route>
 
-          {/* Out of navbar pages */}
-          <Route path="*" element={<NoPage />} />
-        </Routes>
+              {/* Out of navbar pages */}
+              <Route path="*" element={<NoPage />} />
+            </Routes>
+          </UserDataProvider>
+        </AccessTokenProvider>
       </Router>
     </>
   );

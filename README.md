@@ -3,11 +3,11 @@ TestSkool is a quiz web app for teachers, and quiz solving platform for students
 
 Teachers can create quizzes for students, and students can solve prepared quizzes by teachers.
 
-## Incoming TestSkool features:
-
+## Covered TestSkool features:
 ### Login and Register:
 **Dedicated Login and Register pages**: To Login to system and Register a new account are located on separate pages.
 
+## Incoming TestSkool features:
 ### My Profile:
 **Profile Management**: Users will be able to update their profiles, including profile photos, through the "My Profile" section.
 
@@ -41,7 +41,7 @@ TestSkool is designed as a project with two milestones:
 
 
 ## Technology Stack
-This project still under development. Packages will be changed / added as needs. Also this is Test Driven Development (TDD), you can check tests on actions tab.
+This project still under development. Packages will be changed / added as needs.
 
 Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
 
@@ -69,6 +69,11 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
   </tr>
 
   <tr>
+    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://www.npmjs.com/package/retimer" target="_blank">retimer</a></td>
+    <td style="border: 1px solid #ddd; padding: 8px;">Memory-safe token renewal</td>
+  </tr>
+
+  <tr>
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://www.npmjs.com/package/@fontsource/secular-one" target="_blank">Secular One</a></td>
     <td style="border: 1px solid #ddd; padding: 8px;">Heading Font</td>
   </tr>
@@ -85,7 +90,7 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
 
   <tr>
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://vitest.dev/" target="_blank">Vitest</a></td>
-    <td style="border: 1px solid #ddd; padding: 8px;" rowspan="5">Testing</td>
+    <td style="border: 1px solid #ddd; padding: 8px;" rowspan="6">Testing and coverage reporting</td>
   </tr>
 
   <tr>
@@ -102,6 +107,10 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
 
   <tr>
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://mswjs.io/" target="_blank">MSW</a></td>
+  </tr>
+
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://v8.dev/blog/javascript-code-coverage" target="_blank">vitest/coverage-v8</a></td>
   </tr>
 </table>
 
@@ -136,6 +145,16 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://pypi.org/project/python-dotenv/" target="_blank">python-dotenv</a></td>
     <td style="border: 1px solid #ddd; padding: 8px;">Environment variable management</td>
   </tr>
+
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://django-rest-framework-simplejwt.readthedocs.io/en/latest/" target="_blank">django rest framework-simplejwt</a></td>
+    <td style="border: 1px solid #ddd; padding: 8px;">JSON Web Token authentication plugin</td>
+  </tr>
+  
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://coverage.readthedocs.io/en/7.6.12/" target="_blank">Coverage.py</a></td>
+    <td style="border: 1px solid #ddd; padding: 8px;">Reporting test coverages</td>
+  </tr>
 </table>
 
 (See **requirements.txt** file in the root directory for details.)
@@ -148,8 +167,8 @@ Do you want to run this project in your local machine?
 
 **Notes:**
 - This instructions are written only to run in your local machine. To run in a cloud server or derivatives, you will need special configurations.
-- This project developed in <a href="https://www.debian.org/" target="_blank">Debian OS</a>, and instructions will be suit for Debian OS.
-- There are two methods to install and run this project. The first method is easiest, and second method is advanced one. The first method uses <a href="https://www.docker.com/" target="_blank">Docker</a> and second method is manual setup.
+- This project was developed and tested on <a href="https://www.debian.org/" target="_blank">Debian OS</a>, but it should work on other operating systems thanks to <a href="https://www.docker.com/" target="_blank">Docker</a>.
+- There are two methods to install and run this project. The first method is the easiest, using <a href="https://www.docker.com/" target="_blank">Docker</a>, while the second method is a more advanced manual setup.
 
 **Method 1- Run the project with Docker:**
 
@@ -246,11 +265,11 @@ cd testskool/
 ```
 Create an env folder for virtual environment creation:
 ```bash
-python3 -m venv env
+python3 -m venv .venv
 ```
 Now activate virtual environment:
 ```bash
-source env/bin/activate
+source .venv/bin/activate
 ```
 Install the dependencies:
 ```bash
@@ -331,128 +350,168 @@ You can inspect the database on this address:
 ```bash
 .
 ├── backend
-│   ├── backend
-│   │   ├── asgi.py
-│   │   ├── __init__.py
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   └── wsgi.py
-│   ├── manage.py
-│   └── testskool
-│       ├── admin.py
-│       ├── apps.py
-│       ├── __init__.py
-│       ├── migrations
-│       │   └── __init__.py
-│       ├── models.py
-│       ├── serializers.py
-│       ├── tests
-│       │   ├── __init__.py
-│       │   ├── test_register.py
-│       │   ├── test_subject.py
-│       │   └── test_throttling.py
-│       ├── urls.py
-│       ├── utils.py
-│       └── views.py
+│   ├── backend
+│   │   ├── asgi.py
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   └── wsgi.py
+│   ├── manage.py
+│   └── testskool
+│       ├── admin.py
+│       ├── apps.py
+│       ├── __init__.py
+│       ├── migrations
+│       │   ├── 0001_initial.py
+│       │   ├── 0002_user_profile_picture.py
+│       │   ├── 0003_alter_user_email.py
+│       │   ├── 0004_alter_user_email.py
+│       │   ├── 0005_alter_user_email.py
+│       │   ├── 0006_alter_user_email.py
+│       │   └── __init__.py
+│       ├── models.py
+│       ├── serializers.py
+│       ├── tests
+│       │   ├── __init__.py
+│       │   ├── test_my_profile_serializer.py
+│       │   ├── test_register_serializer.py
+│       │   ├── test_register_view.py
+│       │   ├── test_settings.py
+│       │   ├── test_subject_model.py
+│       │   ├── test_subject_serializer.py
+│       │   ├── test_subject_view.py
+│       │   ├── test_throttling.py
+│       │   └── test_user_model.py
+│       ├── urls.py
+│       ├── utils.py
+│       └── views.py
+├── coverages
+│   ├── backend.txt
+│   └── frontend.txt
 ├── docker-compose.yml
 ├── Dockerfile
 ├── docs
-│   └── ts-db-scheme.png
+│   └── ts-db-scheme.png
 ├── entrypoint.sh
 ├── frontend
-│   ├── Dockerfile
-│   ├── eslint.config.js
-│   ├── index.html
-│   ├── package.json
-│   ├── package-lock.json
-│   ├── public
-│   │   ├── about.txt
-│   │   ├── android-chrome-192x192.png
-│   │   ├── android-chrome-512x512.png
-│   │   ├── apple-touch-icon.png
-│   │   ├── favicon-16x16.png
-│   │   ├── favicon-32x32.png
-│   │   ├── favicon.ico
-│   │   └── site.webmanifest
-│   ├── src
-│   │   ├── App.tsx
-│   │   ├── components
-│   │   │   ├── AlertMessages.tsx
-│   │   │   ├── navbar
-│   │   │   │   └── NavbarDrawer.tsx
-│   │   │   └── Navbar.tsx
-│   │   ├── constants
-│   │   │   ├── endpoints.ts
-│   │   │   └── headers.ts
-│   │   ├── main.tsx
-│   │   ├── pages
-│   │   │   ├── CreateQuiz.tsx
-│   │   │   ├── Faq.tsx
-│   │   │   ├── Home.tsx
-│   │   │   ├── Login.tsx
-│   │   │   ├── MyProfile.tsx
-│   │   │   ├── NoPage.tsx
-│   │   │   ├── Register.tsx
-│   │   │   ├── Students.tsx
-│   │   │   └── Teachers.tsx
-│   │   ├── services
-│   │   │   └── api.ts
-│   │   ├── __tests__
-│   │   │   ├── Navbar.test.tsx
-│   │   │   └── Register.test.tsx
-│   │   ├── themes
-│   │   │   ├── fonts.ts
-│   │   │   └── theme.ts
-│   │   ├── @types
-│   │   │   └── fonts.d.ts
-│   │   └── vite-env.d.ts
-│   ├── tsconfig.app.json
-│   ├── tsconfig.json
-│   ├── tsconfig.node.json
-│   ├── vite.config.ts
-│   └── vitest.config.ts
+│   ├── Dockerfile
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── public
+│   │   ├── about.txt
+│   │   ├── android-chrome-192x192.png
+│   │   ├── android-chrome-512x512.png
+│   │   ├── apple-touch-icon.png
+│   │   ├── favicon-16x16.png
+│   │   ├── favicon-32x32.png
+│   │   ├── favicon.ico
+│   │   └── site.webmanifest
+│   ├── src
+│   │   ├── App.tsx
+│   │   ├── components
+│   │   │   ├── AlertMessages.tsx
+│   │   │   ├── form
+│   │   │   │   ├── LoginInput.tsx
+│   │   │   │   └── RegisterInput.tsx
+│   │   │   ├── Form.tsx
+│   │   │   ├── navbar
+│   │   │   │   ├── AuthButtons.tsx
+│   │   │   │   ├── NavbarDrawer.tsx
+│   │   │   │   └── UserMenu.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── PageMessages.tsx
+│   │   │   └── TokenRefresher.tsx
+│   │   ├── constants
+│   │   │   ├── base-urls.ts
+│   │   │   ├── endpoints.ts
+│   │   │   └── headers.ts
+│   │   ├── contexts
+│   │   │   ├── AccessProvider.tsx
+│   │   │   └── UserProvider.tsx
+│   │   ├── hooks
+│   │   │   ├── useAccessToken.ts
+│   │   │   └── useUserData.ts
+│   │   ├── main.tsx
+│   │   ├── pages
+│   │   │   ├── CreateQuiz.tsx
+│   │   │   ├── Faq.tsx
+│   │   │   ├── Home.tsx
+│   │   │   ├── Login.tsx
+│   │   │   ├── MyProfile.tsx
+│   │   │   ├── NoPage.tsx
+│   │   │   ├── Register.tsx
+│   │   │   ├── Students.tsx
+│   │   │   └── Teachers.tsx
+│   │   ├── services
+│   │   │   ├── api.ts
+│   │   │   └── TokenRefresh.ts
+│   │   ├── __tests__
+│   │   │   ├── AlertMessages.test.tsx
+│   │   │   ├── FormComponent.test.tsx
+│   │   │   ├── LoginInput.test.tsx
+│   │   │   ├── LoginPage.test.tsx
+│   │   │   ├── NavbarDrawer.test.tsx
+│   │   │   ├── Navbar.test.tsx
+│   │   │   ├── PageMessages.test.tsx
+│   │   │   ├── RegisterInput.test.tsx
+│   │   │   ├── RegisterPage.test.tsx
+│   │   │   ├── Title.test.tsx
+│   │   │   ├── TokenRefresh.test.tsx
+│   │   │   ├── useAccessTokenHook.test.tsx
+│   │   │   └── UserMenu.test.tsx
+│   │   ├── themes
+│   │   │   ├── colors.tsx
+│   │   │   ├── fonts.ts
+│   │   │   └── theme.ts
+│   │   ├── @types
+│   │   │   └── fonts.d.ts
+│   │   ├── utils
+│   │   │   └── title.ts
+│   │   └── vite-env.d.ts
+│   ├── tsconfig.app.json
+│   ├── tsconfig.json
+│   ├── tsconfig.node.json
+│   ├── vite.config.ts
+│   └── vitest.config.ts
 ├── README.md
 └── requirements.txt
 ```
 (This structure taken via `tree` command on terminal.)
 
 **Directory Explanations:**
+- **./**: Root directory. Contains docs, backend and frontend folders, Docker-related files, the README.md, coverage reports, and python's requirements.txt file.
+- **./docs/**: Contains informational materials, such as database scheme of the project.
+- **./coverages/**: Contains coverage reports for backend and frontend as text files (backend.txt and frontend.txt).
+- **./backend/**: The main directory for the Django backend. Contains the backend and testskool folders, as well as manage.py.
+- **./backend/backend/**: Contains the main configuration and URL setting files for the Django application.
+- **./backend/testskool/**: Contains the application's admin panel, migrations, models, serializers, views, URLs, utility functions, and tests directory for the Django app.
+- **./backend/testskool/migrations/**: Contains migration files for Django database.
+- **./backend/testskool/tests**: Contains test files for Django.
+- **./frontend/**: The main directory for the React JS frontend. Contains configuration files for TypeScript, Vite, Vitest, Docker, Eslint, as well as the main index.html file. Also public and src folders are inside of this directory.
+- **./frontend/public/**: Contains favicons in different sizes, related files, and webmanifest file.
+- **./frontend/src/**: The source code for the web app's frontend. Includes the main TypeScript files, and folders for components, constants, contexts, hooks, pages, services, themes, types, tests, and utils.
+- **./frontend/src/components/**: Contains the core components of the frontend app, such as Navbar.tsx and AlertMessages.tsx.
+- **./frontend/src/components/form/**: Contains form-related components like LoginInput.tsx and RegisterInput.tsx.
+- **./frontend/src/components/navbar/**: Contains NavbarDrawer.tsx, AuthButtons.tsx, and UserMenu.tsx, which are parts of the Navbar.tsx component.
+- **./frontend/src/constants/**: Contains endpoints.ts for URL endpoints, headers.ts for HTTP request headers, and base-urls.ts for base URL configurations.
+- **./frontend/src/contexts/**: Contains context providers like AccessProvider.tsx and UserProvider.tsx for state management.
+- **./frontend/src/hooks/**: Contains custom hooks like useAccessToken.ts and useUserData.ts for frontend logic.
+- **./frontend/src/pages/**: Contains the individual pages for the web app.
+- **./frontend/src/services/**: Contains api.ts, which manages the Axios instance for API requests, and TokenRefresh.ts for token refreshing.
+- **./frontend/src/__tests__/**: Contains test files for the frontend, using Vitest for testing.
+- **./frontend/src/themes/**: Contains theme configuration files (colors.tsx, fonts.ts, theme.ts) to customize Material UI components.
+- **./frontend/src/@types/**: Contains custom type declaration files for TypeScript (e.g., fonts.d.ts).
+- **./frontend/src/utils/**: Contains utility functions like title.ts for frontend helpers.
 
-**./**: Root directory. Contains docs, backend and frontend folders, Docker-related files, the README.md and python's requirements.txt file.
-
-**./docs/**: Contains informational materials, such as database scheme of the project.
-
-**./backend/**: The main directory for the Django backend. Contains the backend and testskool folders, as well as manage.py.
-
-**./backend/backend/**: Contains the main configuration and URL setting files for the Django application.
-
-**./backend/testskool/**: Contains the application's admin panel, migrations, models, serializers, views, URLs, utility functions, and tests directory for the Django app.
-
-**./backend/testskool/migrations/**: Contains migration files for Django database.
-
-**./backend/testskool/tests**:Contains test files for Django.
-
-**./frontend/**: The main directory for the React JS frontend. Contains configuration files for TypeScript, Vite, Vitest, Docker, Eslint, as well as the main index.html file. Also public and src folders are inside of this directory.
-
-**./frontend/public/**: Contains favicons in different sizes, related files, and webmanifest file.
-
-**./frontend/src/**: The source code for the web app's frontend. Includes the main TypeScript files, and folders for components, constants, pages, services, themes, types, and tests.
-
-**./frontend/src/components/**: Contains the core components of the frontend app, such as Navbar.tsx and AlertMessages.tsx.
-
-**./frontend/src/constants/**: Contains endpoints.ts file for URLs endpoints, and headers.ts file for HTTP request headers.
-
-**./frontend/src/components/navbar/**: Contains NavbarDrawer.tsx, which is a part of the Navbar.tsx component.
-
-**./frontend/src/pages/**: Contains the individual pages for the web app.
-
-**./frontend/src/services/**: Contains api.ts, which manages the Axios instance for API requests.
-
-**./frontend/src/__ tests__/**: Contains test files for the frontend, using Vitest for testing.
-
-**./frontend/src/themes/**: Contains theme configuration files to customize Material UI components.
-
-**./frontend/src/@types/**: Contains custom type declaration files for TypeScript.
+---
+## Test Coverage
+This is a Test Driven Development (TDD), you can check tests on actions tab of this project.
+- **Front-end (React):** 78 tests, 71.25% coverage (Vitest V8 – 86%+ on tested files). Details: [frontend.txt](coverages/frontend.txt)
+- **Back-end (Django):** 54 tests, 98% coverage (coverage.py). Details: [backend.txt](coverages/backend.txt)
+- **Total:** 132 tests – full-stack functional coverage exceeds 90%.
+- **Note:** Coverage reports are generated by CI and stored in the repository – see `./coverage/` directory of this repository for details.
 
 November 2024
 

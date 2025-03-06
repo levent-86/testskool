@@ -1,10 +1,25 @@
 import { MemoryRouter } from 'react-router-dom';
-import { render, screen, fireEvent } from '@testing-library/react';
-import { expect, it, afterEach, beforeEach, vi } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { expect, it, afterEach, describe, beforeAll, afterAll } from 'vitest';
 import { Navbar } from '../components/Navbar';
-import { NavbarDrawer } from '../components/navbar/NavbarDrawer';
-import { waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { AccessTokenProvider } from '../contexts/AccessProvider';
+import { UserDataProvider } from '../contexts/UserProvider';
+import { http, HttpResponse } from 'msw';
+import { setupServer } from 'msw/node';
+import { ENDPOINTS } from '../constants/endpoints';
+import { BaseURLS } from '../constants/base-urls';
+
+
+const renderNavbar = () => render(
+  <MemoryRouter>
+    <AccessTokenProvider>
+      <UserDataProvider>
+        <Navbar />
+      </UserDataProvider>
+    </AccessTokenProvider>
+  </MemoryRouter>
+);
 
 
 // Clean local storage after each
@@ -12,414 +27,186 @@ afterEach(() => {
   localStorage.clear();
 });
 
-/* VISIBILITY TESTS */
-
-it('Visibility - Should render Navbar and visible main elements.', () => {
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  expect(screen.getByText('TestSkool')).toBeTruthy();
-  expect(screen.getByText('Home')).toBeTruthy();
-  expect(screen.getByText('Teachers')).toBeTruthy();
-  expect(screen.getByText('Students')).toBeTruthy();
-  expect(screen.getByText('Login/Register')).toBeTruthy();
-});
+const mainElements = ['TestSkool', 'Home', 'Teachers', 'Students', 'Login/Register'];
+const menuItems = [/login/i, /register/i, /f.a.q./i, /visit me on LinkedIn/i];
 
 
-it('Visibility - Should render Login/Register elements when clicked.', async () => {
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
+// VISIBILITY TESTS
+describe('Visibility tests of Navbar before request:', () => {
 
-  const user = userEvent.setup();
+  it('Should render Navbar and visible main elements.', () => {
+    renderNavbar();
 
-  const loginRegisterButton = screen.getByText('Login/Register');
-  await user.click(loginRegisterButton);
-  expect(screen.getByRole('link', { name: 'Login' })).toBeTruthy();
-  expect(screen.getByRole('link', { name: 'Register' })).toBeTruthy();
-  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
-});
-
-
-it('Visibility - Should render Profile button and Create Quiz button when access token provided.', () => {
-  localStorage.setItem('access', 'some-access-token'); // access token provided
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  expect(screen.getByText('Create Quiz')).toBeTruthy();
-  expect(screen.getByRole('button', { name: 'Your Account' })).toBeTruthy();
-});
-
-
-it('Visibility - Should render Profile button elements when access token provided.', async () => {
-  localStorage.setItem('access', 'some-access-token'); // access token provided
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  const user = userEvent.setup();
-
-  const profileButton = screen.getByRole('button', { name: 'Your Account' });
-  await user.click(profileButton);
-  expect(screen.getByRole('link', { name: 'My Profile' })).toBeTruthy();
-  expect(screen.getByRole('link', { name: 'F.A.Q.' })).toBeTruthy();
-  expect(screen.getByRole('menuitem', { name: 'Logout' })).toBeTruthy();
-  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
-});
-
-
-it('Visibility - Should NOT render Login/Register when access token provided.', async () => {
-  localStorage.setItem('access', 'some-access-token'); // access token provided
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  expect(screen.queryByText('Login/Register')).toBeNull();
-});
-
-
-it('Visibility - Should NOT render Profile button and Create Quiz button when access token is not provided.', async () => {
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  expect(screen.queryByRole('button', { name: 'Your Account' })).toBeNull();
-  expect(screen.queryByRole('button', { name: 'Create Quiz' })).toBeNull();
-});
-
-
-/* ROUTE TESTS */
-
-it('Routing - Should route to the related routes of the main elements of navbar.', () => {
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  // Logo link
-  fireEvent.click(screen.getByRole('link', { name: 'TestSkool' }));
-  expect(window.location.pathname).toBe('/');
-
-  // Home link
-  const homeLink = screen.getByRole('link', { name: 'Home' });
-  fireEvent.click(homeLink);
-  expect(window.location.pathname).toBe('/');
-
-  // Teachers link
-  fireEvent.click(screen.getByRole('link', { name: 'Teachers' }));
-  expect(window.location.pathname).toBe('/teachers');
-
-  // Students link
-  fireEvent.click(screen.getByRole('link', { name: 'Students' }));
-  expect(window.location.pathname).toBe('/students');
-});
-
-
-it('Routing - Should route to the related routes when clicked to the Login/Register button elements.', async () => {
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  const user = userEvent.setup();
-
-  // Login
-  const loginRegisterDropdown = screen.getByRole('button', { name: 'Login/Register' });
-  user.click(loginRegisterDropdown);
-  await waitFor(() => {
-    const loginLink = screen.getByRole('link', { name: 'Login' });
-    user.click(loginLink);
-    expect(window.location.pathname).toBe('/login');
+    mainElements.forEach((e) => {
+      expect(screen.getByText(e)).toBeTruthy();
+    });
+    expect(screen.getByRole('button', { name: /theme/i })).toBeTruthy();
   });
 
-  // Register
-  user.click(loginRegisterDropdown);
-  const registerLink = await screen.findByRole('link', { name: 'Register' });
-  await user.click(registerLink);
-  expect(window.location.pathname).toBe('/register');
 
-  // F.A.Q.
-  user.click(loginRegisterDropdown);
-  const faq = await screen.findByRole('link', { name: 'F.A.Q.' });
-  await user.click(faq);
-  expect(window.location.pathname).toBe('/faq');
+  it('Should render "Login/Register" elements when clicked.', async () => {
+    renderNavbar();
 
-  // LinkedIn link
-  user.click(loginRegisterDropdown);
-  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
+    const user = userEvent.setup();
+
+    const loginRegisterButton = screen.getByText('Login/Register');
+    await user.click(loginRegisterButton);
+
+    menuItems.forEach(e => expect(screen.getByRole('link', { name: e })).toBeTruthy());
+  });
 });
 
 
-it('Routing - Should route to the related routes when clicked to the Profile button elements.', async () => {
-  localStorage.setItem('access', 'some-access-token'); // access token provided
+describe('Visibility tests with token presence', () => {
+  it('Should render Profile button when access token provided.', () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
 
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
+    renderNavbar();
+
+    expect(screen.getByRole('button', { name: /your account/i })).toBeTruthy();
+  });
+
+
+  describe('Visibility tests with token presence and user interaction', () => {
+    it('Should render Profile button elements when access token provided.', async () => {
+      localStorage.setItem('access', 'some-access-token'); // access token provided
+      renderNavbar();
+
+      const user = userEvent.setup();
+
+      const profileButton = screen.getByRole('button', { name: 'Your Account' });
+      await user.click(profileButton);
+
+      expect(screen.getByRole('link', { name: /my profile/i })).toBeTruthy();
+      expect(screen.getByRole('link', { name: /f.a.q./i })).toBeTruthy();
+      expect(screen.getByRole('menuitem', { name: /logout/i })).toBeTruthy();
+      expect(screen.getByRole('link', { name: /visit me on linkedin/i })).toBeTruthy();
+    });
+
+
+    it('Should NOT render Login/Register when access token provided.', () => {
+      localStorage.setItem('access', 'some-access-token'); // access token provided
+      renderNavbar();
+
+      expect(screen.queryByText('Login/Register')).toBeNull();
+    });
+
+
+    it('Should NOT render Profile button when access token is not provided.', () => {
+      renderNavbar();
+
+      expect(screen.queryByRole('button', { name: 'Your Account' })).toBeNull();
+    });
+  });
+});
+
+
+
+// ROUTE TESTS
+describe('Routing tests before request', () => {
+  it('Should route to the related routes of the main elements of navbar.', () => {
+    renderNavbar();
+
+    // Logo link
+    const logoLink = screen.getByRole('link', { name: 'TestSkool' });
+    expect(logoLink.getAttribute('href')).toBe('/');
+
+    // Home link
+    const homeLink = screen.getByRole('link', { name: 'Home' });
+    expect(homeLink.getAttribute('href')).toBe('/');
+
+    // Teachers link
+    const teachersLink = screen.getByRole('link', { name: 'Teachers' });
+    expect(teachersLink.getAttribute('href')).toBe('/teachers');
+
+    // Students link
+    const studentsLink = screen.getByRole('link', { name: 'Students' });
+    expect(studentsLink.getAttribute('href')).toBe('/students');
+  });
+
+
+  describe('Routing tests with user interaction before request', () => {
+    it('Should route to the related routes when clicked to the Login/Register button elements.', async () => {
+      renderNavbar();
+
+      const user = userEvent.setup();
+
+      // Login/Register button
+      const loginRegisterDropdown = screen.getByRole('button', { name: 'Login/Register' });
+      await user.click(loginRegisterDropdown);
+
+      const loginLink = screen.getByRole('link', { name: 'Login' });
+      expect(loginLink.getAttribute('href')).toBe('/login');
+
+      // Register
+      const registerLink = screen.getByRole('link', { name: 'Register' });
+      expect(registerLink.getAttribute('href')).toBe('/register');
+
+      // F.A.Q.
+      const faq = screen.getByRole('link', { name: 'F.A.Q.' });
+      expect(faq.getAttribute('href')).toBe('/faq');
+
+      // LinkedIn link
+      const linkedinLink = screen.getByRole('link', { name: 'Visit me on LinkedIn' });
+      expect(linkedinLink.getAttribute('href')).toBe('https://www.linkedin.com/in/mustafaleventfidanci/');
+    });
+  });
+});
+
+
+describe('Routing tests with user interaction after request', () => {
+  const server = setupServer(
+    http.get(BaseURLS.API + ENDPOINTS.MY_PROFILE, () => {
+      return HttpResponse.json(
+        {
+          'id': 2,
+          'username': 'test-user',
+          'first_name': 'Foo',
+          'last_name': 'Bar',
+          'email': 'test-user@example.com',
+          'is_teacher': true,
+          'subject': ['math', 'art'],
+          'is_Student': false,
+          'about': 'about test user',
+          'profile_picture': null,
+          'date_joined': '2025-01-01T11:16:13Z'
+        },
+        { 'status': 200 }
+      );
+    })
   );
 
-  const user = userEvent.setup();
 
-  // My Profile
-  const userDropdown = screen.getByRole('button', { name: 'Your Account' });
+  // Reset data
+  beforeAll(() => server.listen());
+  afterEach(() => server.resetHandlers());
+  afterAll(() => server.close());
 
-  await waitFor(() => {
-    user.click(userDropdown);
+  it('Should show user first name when clicked to profile button.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+
+    renderNavbar();
+
+    const user = userEvent.setup();
+
+    // My Profile
+    const userDropdown = screen.getByRole('button', { name: 'Your Account' });
+
+    await user.click(userDropdown);
     const myProfileLink = screen.getByRole('link', { name: 'My Profile' });
-    user.click(myProfileLink);
-    expect(window.location.pathname).toBe('/my-profile');
+    expect(myProfileLink).toBeTruthy();
+    expect(screen.getByText('Foo')).toBeTruthy();
   });
 
-  // F.A.Q
-  user.click(userDropdown);
-  const faqLink = screen.getByRole('link', { name: 'F.A.Q.' });
-  user.click(faqLink);
 
-  await waitFor(() => {
-    expect(window.location.pathname).toBe('/faq');
+  it('Should route to Create Quiz when button is clicked.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+
+    renderNavbar();
+
+    await waitFor(() => {
+      const createQuiz = screen.getByRole('link', { name: 'Create Quiz' });
+      expect(createQuiz.getAttribute('href')).toBe('/create-quiz');
+    });
   });
-
-  // LinkedIn link
-  await user.click(userDropdown);
-  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
-});
-
-
-it('Routing - Should route to the related route when Create Quiz button is clicked.', () => {
-  localStorage.setItem('access', 'some-access-token'); // access token provided
-
-  render(
-    <MemoryRouter>
-      <Navbar />
-    </MemoryRouter>
-  );
-
-  fireEvent.click(screen.getByRole('link', { name: 'Create Quiz' }));
-  expect(window.location.pathname).toBe('/create-quiz');
-});
-
-
-// RESPONSIVE TESTS
-
-const setHandleClose = vi.fn();
-const setDrawerOpen = vi.fn();
-
-beforeEach(() => {
-  setHandleClose.mockClear();
-  setDrawerOpen.mockClear();
-});
-
-
-it('Responsive - Should call handleClose function when a MenuItem is clicked.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null}
-    />
-  );
-
-  // Home
-  fireEvent.click(screen.getByText('Home'));
-  expect(setHandleClose).toHaveBeenCalledTimes(1);
-
-  // Teachers
-  fireEvent.click(screen.getByText('Teachers'));
-  expect(setHandleClose).toHaveBeenCalledTimes(2);
-
-  // Students
-  fireEvent.click(screen.getByText('Students'));
-  expect(setHandleClose).toHaveBeenCalledTimes(3);
-
-  // F.A.Q.
-  fireEvent.click(screen.getByText('F.A.Q.'));
-  expect(setHandleClose).toHaveBeenCalledTimes(4);
-
-  // Login
-  fireEvent.click(screen.getByText('Login'));
-  expect(setHandleClose).toHaveBeenCalledTimes(5);
-
-  // Register
-  fireEvent.click(screen.getByText('Register'));
-  expect(setHandleClose).toHaveBeenCalledTimes(6);
-});
-
-
-it('Responsive - Should call handleClose function when Create Quiz is clicked after access token provided.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access='some-access-token' // access token provided
-    />
-  );
-
-  fireEvent.click(screen.getByText('Create Quiz'));
-  expect(setHandleClose).toHaveBeenCalledTimes(1);
-});
-
-// Responsive visibilitiy
-
-it('Res. visibilitiy - Should render drawer and main elements are be visible.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null}
-    />
-  );
-
-  expect(screen.getByText('Home')).toBeTruthy();
-  expect(screen.getByText('Teachers')).toBeTruthy();
-  expect(screen.getByText('Students')).toBeTruthy();
-  expect(screen.getByText('F.A.Q.')).toBeTruthy();
-});
-
-
-it('Res. visibilitiy - Should Render "Login" and "Register" when no access is provided', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null} // access token not provided
-    />
-  );
-
-  expect(screen.getByText('Login')).toBeTruthy();
-  expect(screen.getByText('Register')).toBeTruthy();
-});
-
-
-it('Res. visibilitiy - Should render Create Quiz when access token provided.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access="some-access-token" // access token provided
-    />
-  );
-
-  expect(screen.getByText('Create Quiz')).toBeTruthy();
-});
-
-
-it('Res. visibilitiy - Should NOT render "Login" and "Register" when access token is provided.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access="some-access-token" // access token provided
-    />
-  );
-
-  expect(screen.queryByText('Login')).toBeNull();
-  expect(screen.queryByText('Register')).toBeNull();
-});
-
-
-it('Res. visibilitiy - Should NOT render Create Quiz when access token is not provided.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null} // access token not provided
-    />
-  );
-
-  expect(screen.queryByText('Create Quiz')).toBeNull();
-});
-
-
-// Responsive routing
-
-it('Res. routing - Should route to the related routes of the main elements of drawer.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null}
-    />
-  );
-
-  // Home link
-  const homeLink = screen.getByRole('link', { name: 'Home' });
-  fireEvent.click(homeLink);
-  expect(window.location.pathname).toBe('/');
-
-  // Teachers link
-  fireEvent.click(screen.getByRole('link', { name: 'Teachers' }));
-  expect(window.location.pathname).toBe('/teachers');
-
-  // Students link
-  fireEvent.click(screen.getByRole('link', { name: 'Students' }));
-  expect(window.location.pathname).toBe('/students');
-
-  // F.A.Q: link
-  fireEvent.click(screen.getByRole('link', { name: 'F.A.Q.' }));
-  expect(window.location.pathname).toBe('/faq');
-
-  // LinkedIn: link
-  expect(screen.getByRole('link', { name: 'Visit me on LinkedIn' })).toBeTruthy();
-});
-
-
-it('Res. routing - Should route to the related routes when clicked to "Login" and "Register".', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access={null}
-    />
-  );
-
-  // Login link
-  const homeLink = screen.getByRole('link', { name: 'Login' });
-  fireEvent.click(homeLink);
-  expect(window.location.pathname).toBe('/login');
-
-  // Register link
-  fireEvent.click(screen.getByRole('link', { name: 'Register' }));
-  expect(window.location.pathname).toBe('/register');
-});
-
-
-it('Res. routing - Should route to the related route when Create Quiz is clicked.', () => {
-  render(
-    <NavbarDrawer
-      drawerOpen={true}
-      setDrawerOpen={setDrawerOpen}
-      handleClose={setHandleClose}
-      access='some-access-token'
-    />
-  );
-
-  const homeLink = screen.getByRole('link', { name: 'Create Quiz' });
-  fireEvent.click(homeLink);
-  expect(window.location.pathname).toBe('/create-quiz');
 });

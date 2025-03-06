@@ -35,7 +35,10 @@ jobs:
         cd backend/
         python manage.py makemigrations
         python manage.py migrate
-        python manage.py test testskool.tests
+        # python manage.py test testskool.tests
+        coverage run --source='.' manage.py test
+        coverage html --directory=../coverages/backend/coverage
+        coverage report
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
@@ -50,5 +53,4 @@ jobs:
     - name: Run React tests
       run: |
         cd frontend
-        npm run test -- --watch=false
-
+        npm run test -- --coverage --watch=false

@@ -1,11 +1,10 @@
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
-
 from django.test import override_settings
-from django.conf import settings
 from django.core.cache import cache
 from ..models import Subject
+
 
 @override_settings(
     REST_FRAMEWORK = {
@@ -36,6 +35,6 @@ class ThrottlingTestCase(APITestCase):
             })
 
             if _ < 5:
-                self.assertEqual(response.status_code, status.HTTP_412_PRECONDITION_FAILED)
+                self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             else:
                 self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)

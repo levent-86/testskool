@@ -1,23 +1,32 @@
 import React from 'react';
 import { Drawer, Stack, MenuItem, Divider, ListItemIcon, Link } from '@mui/material';
 import { Home, Person, School, PostAdd, Login, PersonAdd, Help, LinkedIn } from '@mui/icons-material';
+import { Link as RouterLink } from 'react-router-dom';
 
 interface NavbarDrawerProps {
   drawerOpen: boolean;
   setDrawerOpen: (open: boolean) => void;
   access: string | null;
   handleClose: () => void;
+  is_teacher?: boolean;
 }
 
-export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawerOpen, access, handleClose }) => (
-  <Drawer
+export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({
+  drawerOpen,
+  setDrawerOpen,
+  access,
+  handleClose,
+  is_teacher
+}) => {
+
+  return <Drawer
     anchor="left"
     open={drawerOpen}
     onClose={() => setDrawerOpen(false)}
     variant="temporary"
   >
-    <Stack direction='column' spacing={2}>
-      <Link href='/' underline='none' color='inherit'>
+    <Stack direction='column' spacing={2} mt={2}>
+      <Link component={RouterLink} to='/' underline='none' color='inherit'>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <Home fontSize="small" />
@@ -25,7 +34,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
           Home
         </MenuItem>
       </Link>
-      <Link href='/teachers' underline='none' color='inherit'>
+      <Link component={RouterLink} to='/teachers' underline='none' color='inherit'>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <Person fontSize="small" />
@@ -33,7 +42,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
           Teachers
         </MenuItem>
       </Link>
-      <Link href='/students' underline='none' color='inherit'>
+      <Link component={RouterLink} to='/students' underline='none' color='inherit'>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <School fontSize="small" />
@@ -42,8 +51,8 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
         </MenuItem>
       </Link>
       {
-        access &&
-        <Link href='/create-quiz' underline='none'>
+        is_teacher &&
+        <Link component={RouterLink} to='/create-quiz' underline='none'>
           <MenuItem onClick={handleClose}>
             <ListItemIcon>
               <PostAdd fontSize="small" />
@@ -52,11 +61,12 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
           </MenuItem>
         </Link>
       }
+
       <Divider />
       {
         !access
         && <>
-          <Link href='/login' underline='none' color='inherit'>
+          <Link component={RouterLink} to='/login' underline='none' color='inherit'>
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <Login fontSize="small" />
@@ -65,7 +75,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
             </MenuItem>
           </Link>
 
-          <Link href='/register' underline='none' color='inherit'>
+          <Link component={RouterLink} to='/register' underline='none' color='inherit'>
             <MenuItem onClick={handleClose}>
               <ListItemIcon>
                 <PersonAdd fontSize="small" />
@@ -76,7 +86,7 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
         </>
       }
 
-      <Link href='/faq' underline='none' color='inherit'>
+      <Link component={RouterLink} to='/faq' underline='none' color='inherit'>
         <MenuItem onClick={handleClose}>
           <ListItemIcon>
             <Help fontSize="small" />
@@ -97,5 +107,5 @@ export const NavbarDrawer: React.FC<NavbarDrawerProps> = ({ drawerOpen, setDrawe
         </MenuItem>
       </Link>
     </Stack>
-  </Drawer>
-);
+  </Drawer>;
+};

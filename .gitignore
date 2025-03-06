@@ -25,10 +25,11 @@ dist-ssr
 
 # Python files
 __pycache__*
-env*
+.venv*
 db.sqlite3
-backend/testskool/migrations/*
-!backend/testskool/migrations/__init__.py
 
 # Other files
 .env
+media/
+coverages/backend/
+coverages/frontend/

@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from dotenv import load_dotenv
 import os
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -66,21 +67,53 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
 ]
 
-# https://www.django-rest-framework.org/#example
-REST_FRAMEWORK = {
-    # https://www.django-rest-framework.org/api-guide/permissions/#setting-the-permission-policy
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ]
-}
-
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     "http://localhost:5173",
     "http://127.0.0.1:8000",
 ]
+CORS_ALLOW_CREDENTIALS: False
+CORS_ALLOW_ALL_ORIGINS = False
 
-CCORS_ALLOW_ALL_ORIGINS = False
+# Caching settings
+# https://docs.djangoproject.com/en/5.1/topics/cache/#local-memory-caching
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'testskool-cache',
+    }
+}
+
+# https://www.django-rest-framework.org/#example
+REST_FRAMEWORK = {
+    # Throttling setting
+    # https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '180/minute',
+        'user': '180/minute'
+    },
+
+    # https://www.django-rest-framework.org/api-guide/permissions/#setting-the-permission-policy
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+
+    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html#project-configuration
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=45),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+}
 
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-user-model
 AUTH_USER_MODEL = 'testskool.User'
@@ -136,29 +169,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Caching settings
-# https://docs.djangoproject.com/en/5.1/topics/cache/#local-memory-caching
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'testskool-cache',
-    }
-}
-
-# DRF throttling setting
-# https://www.django-rest-framework.org/api-guide/throttling/#setting-the-throttling-policy
-REST_FRAMEWORK = {
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '180/minute',
-        'user': '180/minute'
-    }
-}
-
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -175,6 +185,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
+MEDIA_ROOT = os.path.join(BASE_DIR.parent, "media/")
+MEDIA_URL = "media/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -1,7 +1,7 @@
+import Form from '../components/Form';
+
 const Login: React.FC = () => {
-  return <>
-      <h1>Login Page</h1>
-  </>;
+  return <Form page='login' />;
 };
 
 export default Login;
