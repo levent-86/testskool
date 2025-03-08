@@ -5,7 +5,6 @@ import { UserDataProvider } from './contexts/UserProvider';
 // Import components
 import { Navbar } from './components/Navbar';
 import { AlertMessages } from './components/AlertMessages';
-import { TokenRefresher } from './components/TokenRefresher';
 
 // Import pages
 import Home from './pages/Home';
@@ -17,6 +16,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import NoPage from './pages/NoPage';
 import Faq from './pages/Faq';
+import AuthInterceptor from './components/AuthInterceptor';
+
 
 function App() {
 
@@ -25,7 +26,7 @@ function App() {
       <Router>
         <AccessTokenProvider>
           <UserDataProvider>
-            <TokenRefresher />
+            <AuthInterceptor />
             <AlertMessages />
             <Routes>
               {/* Navbar pages */}

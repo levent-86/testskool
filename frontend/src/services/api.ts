@@ -1,8 +1,8 @@
-import axios, { AxiosInstance, InternalAxiosRequestConfig } from 'axios';
+/* Create axios instance */
+
+import axios, { AxiosInstance } from 'axios';
 import { ContentType } from '../constants/headers';
 import { BaseURLS } from '../constants/base-urls';
-
-/* Create axios instance */
 
 const api: AxiosInstance = axios.create({
   baseURL: BaseURLS.API,
@@ -10,20 +10,5 @@ const api: AxiosInstance = axios.create({
     'Content-Type': ContentType.JSON,
   },
 });
-
-
-// Interceptor for access token 
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('access');
-    if (token) {
-      config.headers!['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
 export default api;

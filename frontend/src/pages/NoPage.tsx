@@ -25,6 +25,7 @@ const NoPage: React.FC = () => {
           <Link
             href='https://www.linkedin.com/in/mustafaleventfidanci/'
             underline="none" target="_blank" color='inherit'
+            data-testid='linkedin'
           >
             <LinkedIn fontSize="large" />
           </Link>
@@ -32,6 +33,7 @@ const NoPage: React.FC = () => {
           <Link
             href='https://www.github.com/levent-86/'
             underline="none" target="_blank" color='inherit'
+            data-testid='github'
           >
             <GitHub fontSize="large" />
           </Link>
@@ -40,6 +42,7 @@ const NoPage: React.FC = () => {
             component={RouterLink}
             to='/faq'
             underline="none" color='inherit'
+            data-testid='faq'
           >
             <QuestionMark fontSize="large" />
           </Link>
