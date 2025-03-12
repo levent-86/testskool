@@ -24,8 +24,6 @@ const AuthInterceptor: React.FC = () => {
 
         // Logout if there are no refresh token
         if (!refresh) {
-          localStorage.removeItem('access');
-          localStorage.removeItem('refresh');
           setAccess(null);
           return null;
         }
@@ -48,8 +46,6 @@ const AuthInterceptor: React.FC = () => {
         if (process.env.NODE_ENV === 'development') {
           console.error('Request failed:', error);
         }
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
         setAccess(null);
         return null;
       }
@@ -72,8 +68,6 @@ const AuthInterceptor: React.FC = () => {
             token = await refreshToken();
 
             if (!token) {
-              localStorage.removeItem('access');
-              localStorage.removeItem('refresh');
               setAccess(null);
             }
           }

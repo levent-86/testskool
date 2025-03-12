@@ -9,4 +9,7 @@ export enum ENDPOINTS {
   REGISTER = '/testskool/register/',
   LOGIN = '/testskool/api/token/',
   TOKEN = '/testskool/api/token/refresh/',
+
+  // PUT reqs
+  EDIT_PROFILE = '/testskool/edit-profile/',
 };

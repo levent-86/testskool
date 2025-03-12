@@ -4,7 +4,7 @@ import React, { createContext, useState, ReactNode, useEffect } from 'react';
 import api from '../services/api';
 import { ENDPOINTS } from '../constants/endpoints';
 import { useAccessToken } from '../hooks/useAccessToken';
-import { AxiosError } from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 // User data types
 interface User {
@@ -26,11 +26,6 @@ interface ProviderTypes {
   message?: string;
 }
 
-// Error response types
-interface ErrorResponse {
-  detail: string;
-}
-
 // Create context
 const UserContext = createContext<ProviderTypes | undefined>(undefined);
 
@@ -39,9 +34,11 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [userData, setUserData] = useState<User | null>(null);
   const [message, setMessage] = useState<string>('');
   const { access, setAccess } = useAccessToken();
+  const navigate = useNavigate();
 
   // Log out handler
   const handleLogout = () => {
+    navigate('/');
     localStorage.removeItem('access');
     localStorage.removeItem('refresh');
     setAccess(null);
@@ -58,10 +55,7 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
 
     } catch (error) {
       // Log out if provided token is not valid
-      const err = error as AxiosError<ErrorResponse>;
-      if (err.response?.data?.detail === 'Given token not valid for any token type') {
-        handleLogout();
-      }
+      handleLogout();
 
       // Show error only on development mode
       if (process.env.NODE_ENV === 'development') {

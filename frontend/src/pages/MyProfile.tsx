@@ -1,7 +1,7 @@
+import ProfileLayout from '../components/ProfileLayout';
+
 const MyProfile: React.FC = () => {
-    return (
-        <h1>My Profile Page</h1>
-    );
+  return <ProfileLayout page='my-profile' />;
 };
 
 export default MyProfile;

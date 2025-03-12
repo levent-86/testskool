@@ -13,4 +13,5 @@ urlpatterns = [
     path("subject-list/", views.SubjectListView.as_view(), name="subject-list"),
     path("register/", views.register, name="register"),
     path("my-profile/", views.MyProfileView.as_view(), name="my-profile"),
+    path("edit-profile/", views.edit_profile, name="edit-profile"),
 ]

@@ -45,3 +45,11 @@ class MyProfileView(generics.RetrieveAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class EditProfileView():
+    ...
+
+@api_view(['PUT'])
+def edit_profile(request):
+    print(request.data)
