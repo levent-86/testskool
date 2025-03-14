@@ -159,7 +159,9 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
     formData.append('first_name', first_name);
     formData.append('last_name', last_name);
     formData.append('about', about);
-    if (subject.length > 0) subject.forEach((s) => { formData.append('subject', s); });
+    for (const id of subject) {
+      formData.append('subject', id.toString());
+    }
     if (profile_picture) formData.append('profile_picture', profile_picture);
 
     try {
@@ -169,11 +171,13 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
         }
       });
 
+
     } catch (error) {
       // Show error only on development mode
       if (process.env.NODE_ENV === 'development') {
         console.error('Request failed:', error);
       }
+      setSubjectMessage(error.response.data.subject);
     }
   };
 
@@ -238,9 +242,14 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                       multiple
                       value={subject}
                       onChange={handleSelectChange}
+                      /* show names instead of numbers with selected.join(', ') */
                       renderValue={(selected) => selected.join(', ')}
                       autoWidth
                     >
+                      {/* <MenuItem key={14} value="test-field">
+                        <Checkbox />
+                        <ListItemText primary="test-field" />
+                      </MenuItem> */}
                       {
                         subjects.map(s => (
                           <MenuItem key={s.id} value={s.name}>

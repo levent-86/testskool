@@ -39,7 +39,7 @@ const RegisterInput: React.FunctionComponent<RegisterProps> = ({
   is_teacher, setIsTeacher, isTeacherMessage,
   isSubjectsLoading, filledSelect, setFilledSelect,
   subject, setSubject, subjects, subjectMessage
-}) => {  
+}) => {
   const [showConfirm, setShowConfirm] = useState<boolean>(false);
   const [filledConfirm, setFilledConfirm] = useState<boolean>(true);
 

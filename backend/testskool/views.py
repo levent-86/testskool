@@ -1,4 +1,5 @@
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
@@ -7,7 +8,8 @@ from django.contrib.auth import get_user_model
 from .serializers import (
     Subjects,
     Register,
-    MyProfileSerializer
+    MyProfileSerializer,
+    UpdateProfileSerializer
 )
 from .models import Subject
 from .utils import Notification
@@ -47,9 +49,21 @@ class MyProfileView(generics.RetrieveAPIView):
         return self.request.user
 
 
-class EditProfileView():
-    ...
 
 @api_view(['PUT'])
+@parser_classes([MultiPartParser])
 def edit_profile(request):
-    print(request.data)
+    # Update user informations
+
+    if request.method == "PUT":
+        serializer = UpdateProfileSerializer(instance=request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            content = Notification.get_message("profile_updated")
+            return Response(content, status=status.HTTP_202_ACCEPTED)
+        print("serializer errorleri:", serializer.errors)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        return Response("Error", status=status.HTTP_400_BAD_REQUEST)
+        
+

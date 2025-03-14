@@ -1,6 +1,8 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Subject
+from django.contrib.auth.hashers import check_password
+import json
 
 
 # Serialize the subjects to send (if any)
@@ -145,3 +147,105 @@ class MyProfileSerializer(serializers.ModelSerializer):
         if obj.subject:
             subjects = obj.subject.all()
             return [{"id": subject.id, "name": subject.name} for subject in subjects]
+
+
+
+class UpdateProfileSerializer(serializers.ModelSerializer):
+    """ Update user """
+
+    old_password = serializers.CharField(write_only=True, required=False)
+    confirm_password = serializers.CharField(write_only=True, required=False)
+
+    # Accept as name instead pirmary key (pk)
+    # https://www.django-rest-framework.org/api-guide/relations/#slugrelatedfield
+    subject = serializers.SlugRelatedField(
+        slug_field="name",
+        queryset=Subject.objects.all(),
+        many=True,
+        required=False
+    )
+
+    class Meta:
+        model = get_user_model()
+
+        fields = [
+            "old_password",
+            "password",
+            "confirm_password",
+            "first_name",
+            "last_name",
+            "subject",
+            "about",
+            "profile_picture",
+        ]
+
+        # Field rules
+        extra_kwargs = {
+            "old_password": {"write_only": True, "required": False},
+            "password": {"write_only": True, "required": False},
+            "confirm_password": {"write_only": True, "required": False},
+            "first_name": {"required": False},
+            "last_name": {"required": False},
+            "subject": {"required": False},
+            "about": {"required": False},
+            "profile_picture": {"required": False},
+        }
+
+        # Validation
+        def validate(self, attrs):
+            old_password = attrs.get('old_password')
+            new_password = attrs.get('password')
+            confirm_password = attrs.get('confirm_password')
+            profile_picture = attrs.get("profile_picture")
+
+
+            # Password validation
+            if any([old_password, new_password, confirm_password]):
+                if not all([old_password, new_password, confirm_password]):
+                    raise serializers.ValidationError("Please fill all fields to change your password.")
+                if new_password != confirm_password:
+                    raise serializers.ValidationError("New Password and Confirm New Password fields are not same.")
+                if not check_password(old_password, self.instance.password):
+                    raise serializers.ValidationError({"password": ["Password is not correct."]})
+                if len(new_password) < 8:
+                    raise serializers.ValidationError({"new_password": ["Must be at least 8 characters."]})
+            
+            # Profile picture validation
+            if profile_picture:
+                if profile_picture.size > 307200:
+                    raise serializers.ValidationError("The maximum image size can be 300 KB.")
+                if profile_picture.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+                    raise serializers.ValidationError("Only JPEG, PNG and GIF images are allowed.")
+
+            return attrs
+        
+        # Update
+        def update(self, instance, validated_data):
+            new_password =validated_data.get("password")
+            if new_password:
+                instance.set_password(new_password)
+
+            if validated_data.get("first_name"):
+                instance.first_name = validated_data.get('first_name', instance.first_name)
+            if validated_data.get("last_name"):
+                instance.last_name = validated_data.get('last_name', instance.last_name)
+            if validated_data.get("about"):
+                instance.about = validated_data.get('about', instance.about)
+            
+            if "subject" in validated_data:
+                subject_ids = validated_data["subject"]
+                subjects = Subject.objects.filter(name__in=subject_ids)
+                instance.subject.set(subjects)
+
+
+            if validated_data.get("profile_picture"):
+                new_profile_picture = validated_data.pop("profile_picture")
+
+                # Remove previous profile picture if there are any
+                if instance.profile_picture:
+                    instance.profile_picture.delete()
+                
+                instance.profile_picture = new_profile_picture
+            
+            instance.update()
+            return instance

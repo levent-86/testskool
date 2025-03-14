@@ -5,6 +5,10 @@ class Notification:
                 "status": "success",
                 "message": "Account registered successfully. You are ready to log in!"
             },
+            "profile_updated": {
+                "status": "success",
+                "message": "Profile updated successfully."
+            },
         }
 
         # Return a default message if message not found
