@@ -24,6 +24,8 @@ interface User {
 interface ProviderTypes {
   userData: User | null;
   message?: string;
+  refresh: boolean;
+  setRefresh?: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 // Create context
@@ -34,6 +36,7 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   const [userData, setUserData] = useState<User | null>(null);
   const [message, setMessage] = useState<string>('');
   const { access, setAccess } = useAccessToken();
+  const [refresh, setRefresh] = useState<boolean>(true);
   const navigate = useNavigate();
 
   // Log out handler
@@ -53,6 +56,8 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
 
       setUserData(response.data);
 
+      setRefresh(false);
+
     } catch (error) {
       // Log out if provided token is not valid
       handleLogout();
@@ -65,19 +70,21 @@ export const UserDataProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   useEffect(() => {
-    if (access && !userData) {
+    if (access && (refresh || !userData)) {
       fetchUserData();
       setMessage('');
+      return;
     }
     if (!access && userData) {
       handleLogout();
+      return;
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [access, userData]);
+  }, [access, userData, refresh]);
 
   return (
-    <UserContext.Provider value={{ userData, message }}>
+    <UserContext.Provider value={{ userData, message, refresh, setRefresh }}>
       {children}
     </UserContext.Provider>
   );

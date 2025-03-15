@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Subject
 from django.contrib.auth.hashers import check_password
-import json
+import os
+from django.conf import settings
 
 
 # Serialize the subjects to send (if any)
@@ -150,6 +151,28 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
 
 
+class ImageFieldValidation(serializers.ImageField):
+    # https://www.django-rest-framework.org/api-guide/fields/#custom-fields
+    def to_internal_value(self, data):
+        if data.size > 307200:
+            raise serializers.ValidationError("The maximum image size can be 300 KB.")
+        if data.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+            raise serializers.ValidationError("Only JPEG, PNG and GIF images are allowed.")
+        
+        # Remove previous picture
+        serializer = self.parent
+        instance = getattr(serializer, 'instance', None)
+        if instance and instance.profile_picture:
+            old_picture_path = os.path.join(settings.MEDIA_ROOT, instance.profile_picture.name)
+            if os.path.exists(old_picture_path):
+                os.remove(old_picture_path)
+            instance.profile_picture = None
+
+        return super().to_internal_value(data)
+    
+
+
+
 class UpdateProfileSerializer(serializers.ModelSerializer):
     """ Update user """
 
@@ -164,6 +187,8 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
+
+    profile_picture = ImageFieldValidation(required=False)
 
     class Meta:
         model = get_user_model()
@@ -196,7 +221,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             old_password = attrs.get('old_password')
             new_password = attrs.get('password')
             confirm_password = attrs.get('confirm_password')
-            profile_picture = attrs.get("profile_picture")
 
 
             # Password validation
@@ -209,13 +233,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({"password": ["Password is not correct."]})
                 if len(new_password) < 8:
                     raise serializers.ValidationError({"new_password": ["Must be at least 8 characters."]})
-            
-            # Profile picture validation
-            if profile_picture:
-                if profile_picture.size > 307200:
-                    raise serializers.ValidationError("The maximum image size can be 300 KB.")
-                if profile_picture.content_type not in ["image/jpeg", "image/png", "image/gif"]:
-                    raise serializers.ValidationError("Only JPEG, PNG and GIF images are allowed.")
 
             return attrs
         
@@ -224,28 +241,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             new_password =validated_data.get("password")
             if new_password:
                 instance.set_password(new_password)
-
-            if validated_data.get("first_name"):
-                instance.first_name = validated_data.get('first_name', instance.first_name)
-            if validated_data.get("last_name"):
-                instance.last_name = validated_data.get('last_name', instance.last_name)
-            if validated_data.get("about"):
-                instance.about = validated_data.get('about', instance.about)
             
-            if "subject" in validated_data:
-                subject_ids = validated_data["subject"]
-                subjects = Subject.objects.filter(name__in=subject_ids)
-                instance.subject.set(subjects)
-
-
-            if validated_data.get("profile_picture"):
-                new_profile_picture = validated_data.pop("profile_picture")
-
-                # Remove previous profile picture if there are any
-                if instance.profile_picture:
-                    instance.profile_picture.delete()
-                
-                instance.profile_picture = new_profile_picture
-            
-            instance.update()
+            instance.save()
             return instance

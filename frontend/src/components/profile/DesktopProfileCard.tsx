@@ -82,13 +82,13 @@ const DesktopProfileCard: React.FC = () => {
       <Typography mt={2}>{userData?.username}</Typography>
 
       {/* Dialog buttons */}
-      <Button variant='outlined' sx={{ width: '16em', mt: '1em', mb: '1em' }} onClick={handleEditClickOpen}>Edit Your Profile</Button>
-      <Button variant='outlined' sx={{ width: '16em' }} onClick={handlePasswordClickOpen}>Change Your Password</Button>
+      <Button variant='outlined' sx={{ width: '16em', mt: '1em', mb: '1em' }} onClick={handleEditClickOpen}>Edit Profile</Button>
+      <Button variant='outlined' sx={{ width: '16em' }} onClick={handlePasswordClickOpen}>Change Password</Button>
 
       <Stack width='100%' mt={2} spacing={2}>
         <Typography>First Name: {title(userData?.first_name ? userData.first_name : '-')}</Typography>
         <Typography>Last Name: {title(userData?.last_name ? userData?.last_name : '-')}</Typography>
-        <Typography>About: {title(userData?.about ? userData?.about : '-')}</Typography>
+        <Typography>About: {userData?.about ? userData?.about : '-'}</Typography>
         {
           userData?.is_teacher &&
           <Stack>

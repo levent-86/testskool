@@ -56,14 +56,9 @@ def edit_profile(request):
     # Update user informations
 
     if request.method == "PUT":
-        serializer = UpdateProfileSerializer(instance=request.user, data=request.data)
-        if serializer.is_valid():
+        serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
             serializer.save()
             content = Notification.get_message("profile_updated")
             return Response(content, status=status.HTTP_202_ACCEPTED)
-        print("serializer errorleri:", serializer.errors)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        return Response("Error", status=status.HTTP_400_BAD_REQUEST)
-        
-

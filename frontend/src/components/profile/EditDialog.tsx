@@ -1,11 +1,10 @@
 import {
-  Avatar,
-  Button, Checkbox, Dialog, DialogActions,
-  DialogContent, DialogTitle,
-  FormControl, FormHelperText,
-  InputLabel, ListItemText,
-  MenuItem, Select, SelectChangeEvent,
-  Skeleton, Stack, TextField
+  Avatar, Button, Checkbox, Dialog,
+  DialogActions, DialogContent, DialogTitle,
+  FormControl, FormHelperText, InputLabel,
+  ListItemText, MenuItem, Select,
+  SelectChangeEvent, Skeleton, Stack,
+  TextField
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useUserData } from '../../hooks/useUserData';
@@ -14,8 +13,9 @@ import { ENDPOINTS } from '../../constants/endpoints';
 import { title } from '../../utils/title';
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 import styled from '@emotion/styled';
-import { PageMessages } from '../PageMessages';
-import { ContentType } from '../../constants/headers';
+import { AxiosError } from 'axios';
+import { submitProfileUpdate } from '../../services/profileService';
+
 
 interface EditTypes {
   open: boolean;
@@ -27,21 +27,13 @@ interface Subject {
   id: number;
 }
 
-interface User {
-  id: number;
-  username?: string;
-  first_name?: string;
-  last_name?: string;
-  about?: string;
+interface ErrorResponse {
+  subject?: string;
   profile_picture?: string;
-  is_teacher?: boolean;
-  is_student: boolean;
-  subject?: Subject[];
-  date_joined?: string;
 }
 
 export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
-  const { userData } = useUserData() as { userData: User };
+  const { userData, setRefresh } = useUserData();
 
   // State variables - Datas to send
   const [first_name, setFirstname] = useState<string>('');
@@ -52,12 +44,12 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
 
   // State variables - Datas taken
   const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [subjectMessage, setSubjectMessage] = useState<string>('');
 
   // State variables - Loadings / Previews / Messages
   const [isSubjectsLoading, setIsSubjectsLoading] = useState<boolean>(true);
   const [picturePreview, setPicturePreview] = useState<string>('');
-  const [pictureMessage, setPictureMessage] = useState<string>('');
+  const [pictureMessage, setPictureMessage] = useState<string | null>(null);
+  const [subjectMessage, setSubjectMessage] = useState<string | null>(null);
 
   // First name handling
   const handleFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +94,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
   });
 
   const handleProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPictureMessage('');
+    setPictureMessage(null);
     const picture = e.target.files;
     if (picture && picture[0].size > 307200) {
       return setPictureMessage('Please select an image under 300 KB.');
@@ -140,12 +132,21 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
     // Fetch subjects only if isTeacher is true
     if (userData?.is_teacher && open) {
       fetchSubjects();
-    } else {
-      // Clean the subjects and validations if isTeacher is false
-      setSubject([]);
-      setSubjects([]);
     }
 
+    // Clean input datas if dialog closed
+    if (!open) {
+      setFirstname('');
+      setLastname('');
+      setAbout('');
+      setSubject([]);
+      setSubjects([]);
+      setProfilePicture(null);
+      setIsSubjectsLoading(false);
+      setPicturePreview('');
+      setPictureMessage(null);
+      setSubjectMessage(null);
+    }
   }, [open, userData]);
 
   //! is it enough to prevent render when data is empty?
@@ -155,38 +156,58 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Prepare the data
     const formData = new FormData();
-    formData.append('first_name', first_name);
-    formData.append('last_name', last_name);
-    formData.append('about', about);
-    for (const id of subject) {
-      formData.append('subject', id.toString());
+    if (first_name) formData.append('first_name', first_name);
+    if (last_name) formData.append('last_name', last_name);
+    if (about) formData.append('about', about);
+    if (subject.length > 0) {
+      for (const id of subject) {
+        formData.append('subject', id.toString());
+      }
     }
     if (profile_picture) formData.append('profile_picture', profile_picture);
 
-    try {
-      const response = await api.put(ENDPOINTS.EDIT_PROFILE, formData, {
-        headers: {
-          'Content-Type': ContentType.FORM_DATA
-        }
-      });
+    // Close dialog if there are no data
+    if ([...formData.entries()].length === 0) {
+      handleClose();
+      return;
+    }
 
+    try {
+      const response = await submitProfileUpdate(formData);
+
+      if (response.status < 400) {
+        if (setRefresh) setRefresh(true);
+        handleClose();
+      }
 
     } catch (error) {
+      const err = error as AxiosError<ErrorResponse>;
       // Show error only on development mode
       if (process.env.NODE_ENV === 'development') {
         console.error('Request failed:', error);
       }
-      setSubjectMessage(error.response.data.subject);
+
+      // Show error messages on inputs
+      if (err.response) {
+        const subjectError = err.response.data.subject;
+        const pictureError = err.response.data.profile_picture;
+        if (subjectError === undefined) {
+          setSubjectMessage(null);
+        } else {
+          setSubjectMessage(subjectError);
+        }
+        if (pictureError === undefined) {
+          setPictureMessage(null);
+        } else {
+          setPictureMessage(pictureError);
+        }
+      }
     }
   };
 
   return <>
-    {
-      pictureMessage &&
-      <PageMessages message={pictureMessage} severity='warning' />
-    }
-
     <Dialog
       open={open}
       onClose={handleClose}
@@ -207,7 +228,9 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                 sx={{ width: '80px', height: '80px' }}
                 aria-describedby='avatar-helper-text'
               />
-              <FormHelperText id='avatar-helper-text'>Maximum 300 KB</FormHelperText>
+              <FormHelperText id='avatar-helper-text-size'>Maximum 300 KB</FormHelperText>
+              <FormHelperText id='avatar-helper-text-type'>(jpeg, png, gif)</FormHelperText>
+              <FormHelperText id='avatar-helper-text-backend' error={true}>{pictureMessage}</FormHelperText>
             </Stack>
 
             {/* Profile picture */}
@@ -246,10 +269,6 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                       renderValue={(selected) => selected.join(', ')}
                       autoWidth
                     >
-                      {/* <MenuItem key={14} value="test-field">
-                        <Checkbox />
-                        <ListItemText primary="test-field" />
-                      </MenuItem> */}
                       {
                         subjects.map(s => (
                           <MenuItem key={s.id} value={s.name}>
