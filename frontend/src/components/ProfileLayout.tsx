@@ -2,6 +2,7 @@ import React from 'react';
 import { useUserData } from '../hooks/useUserData';
 import { Box } from '@mui/material';
 import DesktopProfileCard from './profile/DesktopProfileCard';
+import { ProfileActivityPanel } from './profile/ProfileActivityPanel';
 
 
 interface PageProps {
@@ -20,9 +21,11 @@ const ProfileLayout: React.FC<PageProps> = ({ page }) => {
         flexDirection: 'row',
         width: '100%',
       }}>
+      {/* Profile card */}
       <DesktopProfileCard />
-      <p>Hello, world.</p>
-      <p>Şu anda {page} sayfasındayız.</p>
+
+      {/* Activity panel */}
+      <ProfileActivityPanel />
     </Box>
   </>;
 };

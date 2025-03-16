@@ -82,7 +82,7 @@ const DesktopProfileCard: React.FC = () => {
       <Typography mt={2}>{userData?.username}</Typography>
 
       {/* Dialog buttons */}
-      <Button variant='outlined' sx={{ width: '16em', mt: '1em', mb: '1em' }} onClick={handleEditClickOpen}>Edit Profile</Button>
+      <Button variant='outlined' sx={{ width: '16em', mt: '1rem', mb: '1rem' }} onClick={handleEditClickOpen}>Edit Profile</Button>
       <Button variant='outlined' sx={{ width: '16em' }} onClick={handlePasswordClickOpen}>Change Password</Button>
 
       <Stack width='100%' mt={2} spacing={2}>

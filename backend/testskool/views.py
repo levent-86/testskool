@@ -14,7 +14,7 @@ from .serializers import (
 from .models import Subject
 from .utils import Notification
 
-
+print("Kullanılan serializer:", UpdateProfileSerializer)
 
 class SubjectListView(generics.ListAPIView):
     """ List of Teacher / Quiz subjects """
@@ -53,8 +53,6 @@ class MyProfileView(generics.RetrieveAPIView):
 @api_view(['PUT'])
 @parser_classes([MultiPartParser])
 def edit_profile(request):
-    # Update user informations
-
     if request.method == "PUT":
         serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):

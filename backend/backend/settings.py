@@ -51,6 +51,9 @@ INSTALLED_APPS = [
 
     # https://pypi.org/project/django-cors-headers/
     "corsheaders",
+
+    # https://django-rest-framework-simplejwt.readthedocs.io/en/latest/getting_started.html
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [

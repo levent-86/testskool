@@ -1,5 +1,5 @@
 import {
-  Avatar, Button, Checkbox, Dialog,
+  Avatar, Button, Checkbox, CircularProgress, Dialog,
   DialogActions, DialogContent, DialogTitle,
   FormControl, FormHelperText, InputLabel,
   ListItemText, MenuItem, Select,
@@ -47,6 +47,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
 
   // State variables - Loadings / Previews / Messages
   const [isSubjectsLoading, setIsSubjectsLoading] = useState<boolean>(true);
+  const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
   const [picturePreview, setPicturePreview] = useState<string>('');
   const [pictureMessage, setPictureMessage] = useState<string | null>(null);
   const [subjectMessage, setSubjectMessage] = useState<string | null>(null);
@@ -146,6 +147,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
       setPicturePreview('');
       setPictureMessage(null);
       setSubjectMessage(null);
+      setIsButtonLoading(false);
     }
   }, [open, userData]);
 
@@ -155,6 +157,8 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    setIsButtonLoading(true);
 
     // Prepare the data
     const formData = new FormData();
@@ -182,6 +186,8 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
         handleClose();
       }
 
+      setIsButtonLoading(false);
+
     } catch (error) {
       const err = error as AxiosError<ErrorResponse>;
       // Show error only on development mode
@@ -204,6 +210,8 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
           setPictureMessage(pictureError);
         }
       }
+
+      setIsButtonLoading(false);
     }
   };
 
@@ -246,7 +254,6 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                 type="file"
                 onChange={handleProfilePicture}
                 accept="image/jpeg,image/png,image/gif"
-
               />
             </Button>
 
@@ -265,7 +272,6 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                       multiple
                       value={subject}
                       onChange={handleSelectChange}
-                      /* show names instead of numbers with selected.join(', ') */
                       renderValue={(selected) => selected.join(', ')}
                       autoWidth
                     >
@@ -286,7 +292,11 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
-          <Button type="submit">Save Changes</Button>
+          <Button type="submit" disabled={isButtonLoading}>
+            {
+              isButtonLoading ? <CircularProgress size={25} /> : 'Save Changes'
+            }
+          </Button>
         </DialogActions>
       </form>
     </Dialog>

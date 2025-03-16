@@ -151,28 +151,6 @@ class MyProfileSerializer(serializers.ModelSerializer):
 
 
 
-class ImageFieldValidation(serializers.ImageField):
-    # https://www.django-rest-framework.org/api-guide/fields/#custom-fields
-    def to_internal_value(self, data):
-        if data.size > 307200:
-            raise serializers.ValidationError("The maximum image size can be 300 KB.")
-        if data.content_type not in ["image/jpeg", "image/png", "image/gif"]:
-            raise serializers.ValidationError("Only JPEG, PNG and GIF images are allowed.")
-        
-        # Remove previous picture
-        serializer = self.parent
-        instance = getattr(serializer, 'instance', None)
-        if instance and instance.profile_picture:
-            old_picture_path = os.path.join(settings.MEDIA_ROOT, instance.profile_picture.name)
-            if os.path.exists(old_picture_path):
-                os.remove(old_picture_path)
-            instance.profile_picture = None
-
-        return super().to_internal_value(data)
-    
-
-
-
 class UpdateProfileSerializer(serializers.ModelSerializer):
     """ Update user """
 
@@ -187,8 +165,6 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         many=True,
         required=False
     )
-
-    profile_picture = ImageFieldValidation(required=False)
 
     class Meta:
         model = get_user_model()
@@ -216,31 +192,58 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             "profile_picture": {"required": False},
         }
 
-        # Validation
-        def validate(self, attrs):
-            old_password = attrs.get('old_password')
-            new_password = attrs.get('password')
-            confirm_password = attrs.get('confirm_password')
+    # Validation
+    def validate(self, attrs):
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('password')
+        confirm_password = attrs.get('confirm_password')
+        profile_picture = attrs.get("profile_picture")
 
-
-            # Password validation
-            if any([old_password, new_password, confirm_password]):
-                if not all([old_password, new_password, confirm_password]):
-                    raise serializers.ValidationError("Please fill all fields to change your password.")
-                if new_password != confirm_password:
-                    raise serializers.ValidationError("New Password and Confirm New Password fields are not same.")
-                if not check_password(old_password, self.instance.password):
-                    raise serializers.ValidationError({"password": ["Password is not correct."]})
-                if len(new_password) < 8:
-                    raise serializers.ValidationError({"new_password": ["Must be at least 8 characters."]})
-
-            return attrs
+        # Password validation
+        if any([old_password, new_password, confirm_password]):
+            if not all([old_password, new_password, confirm_password]):
+                raise serializers.ValidationError({"confirm_password":["Please fill all fields to change your password."]})
+            if new_password != confirm_password:
+                raise serializers.ValidationError({"confirm_password":["New Password and Confirm New Password are not same."]})
+            if not check_password(old_password, self.instance.password):
+                raise serializers.ValidationError({"password": ["Password is not correct."]})
+            if len(new_password) < 8:
+                raise serializers.ValidationError({"new_password": ["Must be at least 8 characters."]})
         
-        # Update
-        def update(self, instance, validated_data):
-            new_password =validated_data.get("password")
-            if new_password:
-                instance.set_password(new_password)
-            
-            instance.save()
-            return instance
+        # Profile picture validation
+        if profile_picture:
+            if profile_picture.size > 307200:
+                raise serializers.ValidationError({"profile_picture":["The maximum image size can be 300 KB."]})
+            if profile_picture.content_type not in ["image/jpeg", "image/png", "image/gif"]:
+                raise serializers.ValidationError({"profile_picture":["Only JPEG, PNG and GIF images are allowed."]})
+
+        return attrs
+    
+    # Update
+    def update(self, instance, validated_data):
+        first_name = validated_data.get("first_name")
+        last_name = validated_data.get("last_name")
+        about = validated_data.get("about")
+        subject = validated_data.get("subject")
+        new_password = validated_data.get("password")
+        profile_picture = validated_data.get("profile_picture")
+
+        if first_name:
+            instance.first_name = first_name
+        if last_name:
+            instance.last_name = last_name
+        if about:
+            instance.about = about
+        if subject:
+            instance.subject.set(subject)
+        if new_password:
+            instance.set_password(new_password)
+        
+        if profile_picture:
+            # Remove previous profile picture before save
+            if instance.profile_picture:
+                instance.profile_picture.delete()
+            instance.profile_picture = profile_picture
+        
+        instance.save()
+        return instance
