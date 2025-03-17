@@ -17,6 +17,7 @@ export const ProfileActivityPanel: React.FC = () => {
         width: '100%',
         mt: '1rem',
         mr: '1rem',
+        mb: '1rem',
         p: '1rem'
       }}
     >
@@ -30,9 +31,9 @@ export const ProfileActivityPanel: React.FC = () => {
         </Button>
       )}
       {viewMode === 'quizzes' ? (
-        <p>Quizzes</p>
+        <p>TODO: Quizzes</p>
       ) : (
-        <p>Stats</p>
+        <p>TODO: Stats</p>
       )}
     </Paper>
   </>;

@@ -1,8 +1,8 @@
 import React from 'react';
-import { useUserData } from '../hooks/useUserData';
-import { Box } from '@mui/material';
+import { Box, useMediaQuery, useTheme } from '@mui/material';
 import DesktopProfileCard from './profile/DesktopProfileCard';
 import { ProfileActivityPanel } from './profile/ProfileActivityPanel';
+import { MobileProfileCard } from './profile/MobileProfileCard';
 
 
 interface PageProps {
@@ -10,19 +10,25 @@ interface PageProps {
 };
 
 const ProfileLayout: React.FC<PageProps> = ({ page }) => {
-  const { userData } = useUserData();
-  // console.log(userData);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
 
   return <>
     <Box
       sx={{
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: isMobile ? 'column' : 'row',
         width: '100%',
+        alignItems: 'start'
       }}>
-      {/* Profile card */}
-      <DesktopProfileCard />
+      {
+        isMobile ?
+          // Profile card - Mobile
+          <MobileProfileCard page={page} /> :
+          // Profile card - Desktop
+          <DesktopProfileCard page={page} />
+      }
 
       {/* Activity panel */}
       <ProfileActivityPanel />

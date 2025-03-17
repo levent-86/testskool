@@ -1,15 +1,17 @@
 import React, { useState } from 'react';
-import { Paper } from '@mui/material';
 import { EditDialog } from './EditDialog';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
+import {
+  Accordion, AccordionDetails, AccordionSummary,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ProfileContent } from './ProfileContent';
-
 
 interface ProfileCardProps {
   page: 'my-profile' | 'profile';
 }
 
-const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
+export const MobileProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
 
@@ -30,8 +32,6 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
   const handlePasswordClose = () => {
     setOpenPassword(false);
   };
-
-
   return <>
     {
       page === 'my-profile' &&
@@ -50,23 +50,24 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
       </>
     }
 
-    <Paper
-      elevation={3}
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        width: '350px',
-        p: '1rem',
-        m: '1rem'
-      }}>
-      <ProfileContent
-        page={page}
-        handleEditClickOpen={handleEditClickOpen}
-        handlePasswordClickOpen={handlePasswordClickOpen}
-      />
-    </Paper>
+    <Accordion sx={{ width: '100%', mt: '1rem' }}>
+
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel-content"
+        id="panel-header"
+        sx={{ justifySelf: 'center' }}
+      >
+        Profile Details
+      </AccordionSummary>
+
+      <AccordionDetails>
+        <ProfileContent
+          page={page}
+          handleEditClickOpen={handleEditClickOpen}
+          handlePasswordClickOpen={handlePasswordClickOpen}
+        />
+      </AccordionDetails>
+    </Accordion>
   </>;
 };
-
-export default DesktopProfileCard;

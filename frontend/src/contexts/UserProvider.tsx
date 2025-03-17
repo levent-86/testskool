@@ -6,6 +6,11 @@ import { ENDPOINTS } from '../constants/endpoints';
 import { useAccessToken } from '../hooks/useAccessToken';
 import { useNavigate } from 'react-router-dom';
 
+interface Subject {
+  name: string;
+  id: number;
+}
+
 // User data types
 interface User {
   id: number;
@@ -14,7 +19,7 @@ interface User {
   last_name?: string;
   is_student: boolean;
   is_teacher: boolean;
-  subject?: string[];
+  subject?: Subject[];
   about?: string;
   profile_picture?: string;
   date_joined: string;

@@ -46,9 +46,7 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           // Responsive button font sizes
-          '@media (min-width:600px)': {
-            fontSize: '0.75rem',
-          },
+          fontSize: '0.75rem',
           '@media (min-width:900px)': {
             fontSize: '0.875rem',
           },
@@ -61,21 +59,14 @@ const theme = createTheme({
       styleOverrides: {
         // Responsive typography sizes
         h4: {
-          '@media (min-width:600px)': {
-            fontSize: '1.7rem',
-          },
+          fontSize: '1.7rem',
           '@media (min-width:900px)': {
             fontSize: '2.1rem',
           },
         },
 
         h3: {
-          '@media (max-width:600px)': {
-            fontSize: '2.1rem',
-          },
-          '@media (min-width:600px)': {
-            fontSize: '2.1rem',
-          },
+          fontSize: '2.1rem',
           '@media (min-width:900px)': {
             fontSize: '3rem',
           },
