@@ -274,6 +274,7 @@ class UpdateUserSerializerTest(APITestCase):
     def test_profile_picture_invalid_image_type(self):
         bmp_image = self.create_image_file(size_kb=100, format="BMP", filename="test_bmp")
         data = {"profile_picture": bmp_image}
+
         serializer = UpdateProfileSerializer(instance=self.user, data=data)
         self.assertFalse(serializer.is_valid())
         self.assertIn("profile_picture", serializer.errors)
@@ -306,4 +307,3 @@ class UpdateUserSerializerTest(APITestCase):
         self.assertTrue(serializer2.is_valid())
         updated_user2 = serializer2.save()
         self.assertEqual(updated_user2.profile_picture.name, "profile-pictures/B.jpeg")
-    

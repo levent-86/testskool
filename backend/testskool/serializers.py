@@ -256,16 +256,17 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
 
 
 class DeleteAccountSerializer(serializers.Serializer):
+    """ Delete account """
     password = serializers.CharField(write_only=True)
 
     def validate_password(self, value):
-        user = self.context["request"].user
+        user = self.context.get("request").user
         if not check_password(value, user.password):
             raise serializers.ValidationError("Incorrect password.")
         return value
 
     def delete(self):
-        user = self.context["request"].user
+        user = self.context.get("request").user
         if user.profile_picture:
-            user.profile_picture.delete(save=False)  # Dosyayı sil, ama kaydetme
+            user.profile_picture.delete(save=False)
         user.delete()

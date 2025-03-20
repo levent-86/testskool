@@ -17,8 +17,10 @@ testskool/migrations/0005_alter_user_email.py           4      0   100%
 testskool/migrations/0006_alter_user_email.py           4      0   100%
 testskool/migrations/__init__.py                        0      0   100%
 testskool/models.py                                    15      0   100%
-testskool/serializers.py                               60      1    98%
+testskool/serializers.py                              129      2    98%
 testskool/tests/__init__.py                             0      0   100%
+testskool/tests/test_delete_account_serializer.py      25      0   100%
+testskool/tests/test_delete_account_view.py            22      0   100%
 testskool/tests/test_my_profile_serializer.py          44      0   100%
 testskool/tests/test_register_serializer.py           111      0   100%
 testskool/tests/test_register_view.py                  83      0   100%
@@ -27,9 +29,11 @@ testskool/tests/test_subject_model.py                  39      0   100%
 testskool/tests/test_subject_serializer.py             19      0   100%
 testskool/tests/test_subject_view.py                   30      0   100%
 testskool/tests/test_throttling.py                     19      1    95%
+testskool/tests/test_update_profile_serializer.py     163      0   100%
+testskool/tests/test_update_profile_view.py            22      0   100%
 testskool/tests/test_user_model.py                     46      0   100%
 testskool/urls.py                                       4      0   100%
 testskool/utils.py                                      4      0   100%
-testskool/views.py                                     28      1    96%
+testskool/views.py                                     47      2    96%
 -----------------------------------------------------------------------
-TOTAL                                                 639     13    98%
+TOTAL                                                 959     15    98%

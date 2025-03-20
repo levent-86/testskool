@@ -12,7 +12,6 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { useAccessToken } from '../../hooks/useAccessToken';
 
 
-
 interface DeleteTypes {
   open: boolean;
   handleClose: () => void;
@@ -27,10 +26,12 @@ interface ErrorResponse {
 }
 
 export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
+  // Data to be sent
   const [password, setPassword] = useState<string>('');
 
   const { setAccess } = useAccessToken();
 
+  // States for show message / loading / show - hide password
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [isButtonLoading, setIsButtonLoading] = useState<boolean>(false);
   const [passwordMessage, setPasswordMessage] = useState<string | null>(null);
@@ -40,10 +41,12 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
     setPassword(value);
   };
 
+  // Handlers for input
   const handleShowHidePassword = (): void => setShowPassword((show) => !show);
   const handleMouseDownPassword = (e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault();
   const handleMouseUpPassword = (e: React.MouseEvent<HTMLButtonElement>) => e.preventDefault();
 
+  // Send DELETE request
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -57,6 +60,7 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
 
       if (response.status < 400) {
         handleClose();
+        setPasswordMessage(null);
         setAccess(null);
       }
 
@@ -86,6 +90,7 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
   useEffect(() => {
     if (!open) {
       setPassword('');
+      setPasswordMessage(null);
       setIsButtonLoading(false);
     };
   }, [open]);
@@ -105,6 +110,7 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
           <Typography variant="body2">This can NOT be undone!</Typography>
           <Typography variant="body2">When you delete your account, all your data will be lost.</Typography>
 
+          {/* Password input */}
           <FormControl variant="filled" sx={{ mt: '2rem', width: '100%' }}>
             <InputLabel htmlFor="filled-adornment-password">Password</InputLabel>
             <FilledInput
@@ -133,6 +139,8 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
             <FormHelperText error={true}>{passwordMessage}</FormHelperText>
           </FormControl>
         </DialogContent>
+
+        {/* Button */}
         <DialogActions sx={{ mb: '1rem' }}>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" disabled={isButtonLoading} color='error'>
