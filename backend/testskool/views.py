@@ -9,12 +9,12 @@ from .serializers import (
     Subjects,
     Register,
     MyProfileSerializer,
-    UpdateProfileSerializer
+    UpdateProfileSerializer,
+    DeleteAccountSerializer
 )
 from .models import Subject
 from .utils import Notification
 
-print("Kullanılan serializer:", UpdateProfileSerializer)
 
 class SubjectListView(generics.ListAPIView):
     """ List of Teacher / Quiz subjects """
@@ -53,6 +53,7 @@ class MyProfileView(generics.RetrieveAPIView):
 @api_view(['PUT'])
 @parser_classes([MultiPartParser])
 def edit_profile(request):
+    """ Edit user information """
     if request.method == "PUT":
         serializer = UpdateProfileSerializer(instance=request.user, data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
@@ -60,3 +61,15 @@ def edit_profile(request):
             content = Notification.get_message("profile_updated")
             return Response(content, status=status.HTTP_202_ACCEPTED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+@api_view(["DELETE"])
+def delete_account(request):
+    """ Delete account """
+    serializer = DeleteAccountSerializer(data=request.data, context={"request": request})
+    if serializer.is_valid():
+        serializer.delete()
+        content = Notification.get_message("account_deleted")
+        return Response(content, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

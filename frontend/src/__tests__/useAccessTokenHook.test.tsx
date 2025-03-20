@@ -27,4 +27,10 @@ describe('useAccessToken:', () => {
   it('should throw error if used outside provider.', () => {
     expect(() => renderHook(() => useAccessToken())).toThrow('useAccessToken must be used within AccessTokenProvider');
   });
+
+  it('should throw error if used outside provider', () => {
+    expect(() => renderHook(() => useAccessToken())).toThrow(
+      'useAccessToken must be used within AccessTokenProvider'
+    );
+  });
 });

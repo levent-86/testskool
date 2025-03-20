@@ -9,6 +9,10 @@ class Notification:
                 "status": "success",
                 "message": "Profile updated successfully."
             },
+            "account_deleted": {
+                "status": "success",
+                "message": "Account deleted successfully."
+            },
         }
 
         # Return a default message if message not found

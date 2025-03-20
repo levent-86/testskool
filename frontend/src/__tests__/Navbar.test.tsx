@@ -68,7 +68,7 @@ describe('Visibility tests with token presence', () => {
 
 
   describe('Visibility tests with token presence and user interaction', () => {
-    it('Should render Profile button elements when access token provided.', async () => {
+    it('Should NOT enough to access to profile button elemnt only if access token provided.', async () => {
       localStorage.setItem('access', 'some-access-token'); // access token provided
       renderNavbar();
 
@@ -77,10 +77,13 @@ describe('Visibility tests with token presence', () => {
       const profileButton = screen.getByRole('button', { name: 'Your Account' });
       await user.click(profileButton);
 
-      expect(screen.getByRole('link', { name: /my profile/i })).toBeTruthy();
-      expect(screen.getByRole('link', { name: /f.a.q./i })).toBeTruthy();
-      expect(screen.getByRole('menuitem', { name: /logout/i })).toBeTruthy();
-      expect(screen.getByRole('link', { name: /visit me on linkedin/i })).toBeTruthy();
+      expect(screen.queryByRole('link', { name: /my profile/i })).toBeFalsy();
+      expect(screen.queryByRole('link', { name: /f.a.q./i })).toBeFalsy();
+      expect(screen.queryByRole('menuitem', { name: /logout/i })).toBeFalsy();
+      expect(screen.queryByRole('link', { name: /visit me on linkedin/i })).toBeFalsy();
+
+      // also logged out
+      expect(screen.getByText('Logged out')).toBeTruthy();
     });
 
 
@@ -164,7 +167,7 @@ describe('Routing tests with user interaction after request', () => {
           'first_name': 'Foo',
           'last_name': 'Bar',
           'email': 'test-user@example.com',
-          'is_teacher': true,
+          'is_teacher': true, // User is a teacher as default
           'subject': ['math', 'art'],
           'is_Student': false,
           'about': 'about test user',
@@ -182,6 +185,39 @@ describe('Routing tests with user interaction after request', () => {
   afterEach(() => server.resetHandlers());
   afterAll(() => server.close());
 
+  it('Should render Profile button elements.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+    renderNavbar();
+
+    const user = userEvent.setup();
+
+    const profileButton = screen.getByRole('button', { name: 'Your Account' });
+    await user.click(profileButton);
+
+    expect(screen.getByRole('link', { name: /my profile/i })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /f.a.q./i })).toBeTruthy();
+    expect(screen.getByRole('menuitem', { name: /logout/i })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /visit me on linkedin/i })).toBeTruthy();
+  });
+
+  it('Should route to the related routes when clicked to Profile elements.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+    renderNavbar();
+
+    const user = userEvent.setup();
+
+    const profileButton = screen.getByRole('button', { name: 'Your Account' });
+    await user.click(profileButton);
+
+    const myProfile = screen.getByRole('link', { name: /my profile/i });
+    const faq = screen.getByRole('link', { name: /f.a.q/i });
+    const linkedIn = screen.getByRole('link', { name: /visit me on linkedin/i });
+
+    expect(myProfile.getAttribute('href')).toBe('/my-profile');
+    expect(faq.getAttribute('href')).toBe('/faq');
+    expect(linkedIn.getAttribute('href')).toBe('https://www.linkedin.com/in/mustafaleventfidanci/');
+  });
+
   it('Should show user first name when clicked to profile button.', async () => {
     localStorage.setItem('access', 'some-access-token'); // access token provided
 
@@ -198,6 +234,47 @@ describe('Routing tests with user interaction after request', () => {
     expect(screen.getByText('Foo')).toBeTruthy();
   });
 
+  it('Should render Create Quiz button for teacher.', async () => {
+    localStorage.setItem('access', 'some-access-token');
+
+    renderNavbar();
+
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Create Quiz' }));
+    });
+  });
+
+  it('Should NOT render Create Quiz button for student.', async () => {
+    localStorage.setItem('access', 'some-access-token');
+
+    // Login as a student
+    server.use(
+      http.get(BaseURLS.API + ENDPOINTS.MY_PROFILE, () => {
+        return HttpResponse.json(
+          {
+            'id': 2,
+            'username': 'student-user',
+            'first_name': 'Foo',
+            'last_name': 'Bar',
+            'email': 'test-user@example.com',
+            'is_teacher': false,
+            'subject': ['math', 'art'],
+            'is_Student': true, // user is a student now
+            'about': 'about test user',
+            'profile_picture': null,
+            'date_joined': '2025-01-01T11:16:13Z'
+          },
+          { 'status': 200 }
+        );
+      }),
+    );
+
+    renderNavbar();
+
+    await waitFor(() => {
+      expect(screen.queryByRole('link', { name: 'Create Quiz' })).toBeFalsy();
+    });
+  });
 
   it('Should route to Create Quiz when button is clicked.', async () => {
     localStorage.setItem('access', 'some-access-token'); // access token provided
@@ -208,5 +285,42 @@ describe('Routing tests with user interaction after request', () => {
       const createQuiz = screen.getByRole('link', { name: 'Create Quiz' });
       expect(createQuiz.getAttribute('href')).toBe('/create-quiz');
     });
+  });
+
+  it('Should show Looged out message to user when clicked to Logout button.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+
+    renderNavbar();
+
+    const user = userEvent.setup();
+
+    // My Profile
+    const userDropdown = screen.getByRole('button', { name: 'Your Account' });
+    await user.click(userDropdown);
+
+    const logoutBtn = screen.getByRole('menuitem', { name: /logout/i });
+    await user.click(logoutBtn);
+    expect(screen.getByText('Logged out')).toBeTruthy();
+  });
+
+  it('Should NOT render Profile and Create Quiz buttons after logged out.', async () => {
+    localStorage.setItem('access', 'some-access-token'); // access token provided
+
+    renderNavbar();
+
+    const user = userEvent.setup();
+
+    // My Profile
+    const userDropdown = screen.getByRole('button', { name: 'Your Account' });
+    await user.click(userDropdown);
+
+    const logoutBtn = screen.getByRole('menuitem', { name: /logout/i });
+    await user.click(logoutBtn);
+
+    // There are no Profile button
+    expect(screen.queryByRole('button', { name: 'Your Account' })).toBeFalsy();
+
+    // There are no Create Quiz button
+    expect(screen.queryByRole('link', { name: 'Create Quiz' })).toBeFalsy();
   });
 });

@@ -30,6 +30,7 @@ interface Subject {
 interface ErrorResponse {
   subject?: string;
   profile_picture?: string;
+  about?: string;
 }
 
 export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
@@ -51,6 +52,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
   const [picturePreview, setPicturePreview] = useState<string>('');
   const [pictureMessage, setPictureMessage] = useState<string | null>(null);
   const [subjectMessage, setSubjectMessage] = useState<string | null>(null);
+  const [aboutMessage, setAboutMessage] = useState<string | null>(null);
 
   // First name handling
   const handleFirstName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -199,6 +201,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
       if (err.response) {
         const subjectError = err.response.data.subject;
         const pictureError = err.response.data.profile_picture;
+        const aboutError = err.response.data.about;
         if (subjectError === undefined) {
           setSubjectMessage(null);
         } else {
@@ -208,6 +211,11 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
           setPictureMessage(null);
         } else {
           setPictureMessage(pictureError);
+        }
+        if (aboutError === undefined) {
+          setAboutMessage(null);
+        } else {
+          setAboutMessage(aboutError);
         }
       }
 
@@ -260,6 +268,7 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
             <TextField label="First Name" variant="filled" value={first_name} onChange={handleFirstName} fullWidth />
             <TextField label="Last Name" variant="filled" value={last_name} onChange={handleLastName} fullWidth />
             <TextField label="About" variant="filled" value={about} onChange={handleAbout} fullWidth multiline />
+            <FormHelperText error={true}>{aboutMessage}</FormHelperText>
             {
               userData.is_teacher && (
                 isSubjectsLoading ? (

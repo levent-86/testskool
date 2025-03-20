@@ -12,4 +12,7 @@ export enum ENDPOINTS {
 
   // PUT reqs
   EDIT_PROFILE = '/testskool/edit-profile/',
+
+  // DELETE reqs
+  DELETE_ACCOUNT = '/testskool/delete-account/'
 };

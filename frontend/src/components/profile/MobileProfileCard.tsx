@@ -6,6 +6,7 @@ import {
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { ProfileContent } from './ProfileContent';
+import { DeleteDialog } from './DeleteAccountDialog';
 
 interface ProfileCardProps {
   page: 'my-profile' | 'profile';
@@ -14,6 +15,7 @@ interface ProfileCardProps {
 export const MobileProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
+  const [openDelete, setOpenDelete] = useState<boolean>(false);
 
   // Edit modal open/close
   const handleEditClickOpen = () => {
@@ -32,6 +34,15 @@ export const MobileProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
   const handlePasswordClose = () => {
     setOpenPassword(false);
   };
+
+  // Delete account dialog open/close
+  const handleDeleteOpen = () => {
+    setOpenDelete(true);
+  };
+
+  const handleDeleteClose = () => {
+    setOpenDelete(false);
+  };
   return <>
     {
       page === 'my-profile' &&
@@ -46,6 +57,12 @@ export const MobileProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
         <ChangePasswordDialog
           handleClose={handlePasswordClose}
           open={openPassword}
+        />
+
+        {/* Delete account dialog */}
+        <DeleteDialog
+          handleClose={handleDeleteClose}
+          open={openDelete}
         />
       </>
     }
@@ -66,6 +83,7 @@ export const MobileProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
           page={page}
           handleEditClickOpen={handleEditClickOpen}
           handlePasswordClickOpen={handlePasswordClickOpen}
+          handleDeleteOpen={handleDeleteOpen}
         />
       </AccordionDetails>
     </Accordion>

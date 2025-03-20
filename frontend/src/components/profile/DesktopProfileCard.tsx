@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Paper } from '@mui/material';
-import { EditDialog } from './EditDialog';
 import { ChangePasswordDialog } from './ChangePasswordDialog';
+import { DeleteDialog } from './DeleteAccountDialog';
+import { EditDialog } from './EditDialog';
 import { ProfileContent } from './ProfileContent';
 
 
@@ -12,8 +13,9 @@ interface ProfileCardProps {
 const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
   const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openPassword, setOpenPassword] = useState<boolean>(false);
+  const [openDelete, setOpenDelete] = useState<boolean>(false);
 
-  // Edit modal open/close
+  // Edit dialog open/close
   const handleEditClickOpen = () => {
     setOpenEdit(true);
   };
@@ -22,7 +24,7 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
     setOpenEdit(false);
   };
 
-  // Password modal open/close
+  // Password dialog open/close
   const handlePasswordClickOpen = () => {
     setOpenPassword(true);
   };
@@ -31,8 +33,18 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
     setOpenPassword(false);
   };
 
+  // Delete account dialog open/close
+  const handleDeleteOpen = () => {
+    setOpenDelete(true);
+  };
+
+  const handleDeleteClose = () => {
+    setOpenDelete(false);
+  };
+
 
   return <>
+    {/* Dialogs */}
     {
       page === 'my-profile' &&
       <>
@@ -46,6 +58,12 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
         <ChangePasswordDialog
           handleClose={handlePasswordClose}
           open={openPassword}
+        />
+
+        {/* Delete account dialog */}
+        <DeleteDialog
+          handleClose={handleDeleteClose}
+          open={openDelete}
         />
       </>
     }
@@ -64,6 +82,7 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
         page={page}
         handleEditClickOpen={handleEditClickOpen}
         handlePasswordClickOpen={handlePasswordClickOpen}
+        handleDeleteOpen={handleDeleteOpen}
       />
     </Paper>
   </>;

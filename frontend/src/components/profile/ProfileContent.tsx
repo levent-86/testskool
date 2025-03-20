@@ -9,12 +9,14 @@ interface ProfileContentProps {
   page: 'my-profile' | 'profile';
   handleEditClickOpen: () => void;
   handlePasswordClickOpen: () => void;
+  handleDeleteOpen: () => void;
 }
 
 export const ProfileContent: React.FC<ProfileContentProps> = ({
   page,
   handleEditClickOpen,
   handlePasswordClickOpen,
+  handleDeleteOpen,
 }) => {
   const { userData } = useUserData();
   return (
@@ -29,13 +31,16 @@ export const ProfileContent: React.FC<ProfileContentProps> = ({
         <>
           <Button
             variant="outlined"
-            sx={{ width: '16em', mt: '1rem', mb: '1rem' }}
+            sx={{ width: '16em', mt: '1rem' }}
             onClick={handleEditClickOpen}
           >
             Edit Profile
           </Button>
-          <Button variant="outlined" sx={{ width: '16em' }} onClick={handlePasswordClickOpen}>
+          <Button variant="outlined" sx={{ width: '16em', mb: '1rem', mt: '1rem' }} onClick={handlePasswordClickOpen}>
             Change Password
+          </Button>
+          <Button variant='outlined' sx={{ width: '16em' }} onClick={handleDeleteOpen} color='error'>
+            Delete My Account
           </Button>
         </>
       )}

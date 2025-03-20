@@ -2,8 +2,6 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from .models import Subject
 from django.contrib.auth.hashers import check_password
-import os
-from django.conf import settings
 
 
 # Serialize the subjects to send (if any)
@@ -198,6 +196,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         new_password = attrs.get('password')
         confirm_password = attrs.get('confirm_password')
         profile_picture = attrs.get("profile_picture")
+        subject = attrs.get("subject")
 
         # Password validation
         if any([old_password, new_password, confirm_password]):
@@ -209,6 +208,12 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError({"password": ["Password is not correct."]})
             if len(new_password) < 8:
                 raise serializers.ValidationError({"new_password": ["Must be at least 8 characters."]})
+        
+        # Subject validation
+        if subject and self.instance.is_student:
+            raise serializers.ValidationError({"subject": ["Only teachers can choose a subject."]})
+        if self.instance.is_teacher and "subject" in attrs and not subject:
+            raise serializers.ValidationError({"subject": ["Teachers must have at least one subject."]})
         
         # Profile picture validation
         if profile_picture:
@@ -234,7 +239,7 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
             instance.last_name = last_name
         if about:
             instance.about = about
-        if subject:
+        if "subject" in validated_data:
             instance.subject.set(subject)
         if new_password:
             instance.set_password(new_password)
@@ -247,3 +252,20 @@ class UpdateProfileSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
+
+
+
+class DeleteAccountSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+
+    def validate_password(self, value):
+        user = self.context["request"].user
+        if not check_password(value, user.password):
+            raise serializers.ValidationError("Incorrect password.")
+        return value
+
+    def delete(self):
+        user = self.context["request"].user
+        if user.profile_picture:
+            user.profile_picture.delete(save=False)  # Dosyayı sil, ama kaydetme
+        user.delete()

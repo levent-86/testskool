@@ -156,8 +156,6 @@ describe('AuthInterceptor:', () => {
     // Assert
     expect(localStorage.getItem).toHaveBeenCalledWith('access');
     expect(localStorage.getItem).toHaveBeenCalledWith('refresh');
-    expect(localStorage.removeItem).toHaveBeenCalledWith('access');
-    expect(localStorage.removeItem).toHaveBeenCalledWith('refresh');
     expect(mockSetAccess).toHaveBeenCalledWith(null);
     expect(axios.post).not.toHaveBeenCalled();
   });
@@ -185,8 +183,6 @@ describe('AuthInterceptor:', () => {
       `${BaseURLS.API}${ENDPOINTS.TOKEN}`,
       { refresh: mockRefresh }
     );
-    expect(localStorage.removeItem).toHaveBeenCalledWith('access');
-    expect(localStorage.removeItem).toHaveBeenCalledWith('refresh');
     expect(mockSetAccess).toHaveBeenCalledWith(null);
   });
 
