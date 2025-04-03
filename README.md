@@ -7,10 +7,11 @@ Teachers can create quizzes for students, and students can solve prepared quizze
 ### Login and Register:
 **Dedicated Login and Register pages**: To Login to system and Register a new account are located on separate pages.
 
-## Incoming TestSkool features:
 ### My Profile:
 **Profile Management**: Users will be able to update their profiles, including profile photos, through the "My Profile" section.
 
+## Incoming TestSkool features:
+### My Profile:
 - **Teacher View:** If the user is a teacher, they also will be able to display the quizzes they have created.
 
 - **Student View:** If the user is a student, they also will be able to display all the quizzes they have completed. Additionally, there will be interactive charts to showing their performances in detail.
@@ -85,7 +86,7 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
 
   <tr>
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://vitest.dev/" target="_blank">Vitest</a></td>
-    <td style="border: 1px solid #ddd; padding: 8px;" rowspan="6">Testing and coverage reporting</td>
+    <td style="border: 1px solid #ddd; padding: 8px;" rowspan="7">Testing and coverage reporting</td>
   </tr>
 
   <tr>
@@ -102,6 +103,10 @@ Testskool uses Django with DRF on the back-end, and ReactJS on the front-end.
 
   <tr>
     <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://mswjs.io/" target="_blank">MSW</a></td>
+  </tr>
+
+  <tr>
+    <td style="border: 1px solid #ddd; padding: 8px;"><a href="https://github.com/ericf/css-mediaquery" target="_blank">css-mediaquery</a></td>
   </tr>
 
   <tr>
@@ -183,7 +188,7 @@ After you download TestSkool repository to your machine, you will see `docker-co
   - DJANGO_SUPERUSER_PASSWORD=yourPassword
 ```
 if you omit or consider to leave it as is, your default username, email and password will stay as;
-```
+```text
 username: admin
 email: admin@example.com
 password: 12345
@@ -368,6 +373,8 @@ You can inspect the database on this address:
 │       ├── serializers.py
 │       ├── tests
 │       │   ├── __init__.py
+│       │   ├── test_delete_account_serializer.py
+│       │   ├── test_delete_account_view.py
 │       │   ├── test_my_profile_serializer.py
 │       │   ├── test_register_serializer.py
 │       │   ├── test_register_view.py
@@ -376,6 +383,8 @@ You can inspect the database on this address:
 │       │   ├── test_subject_serializer.py
 │       │   ├── test_subject_view.py
 │       │   ├── test_throttling.py
+│       │   ├── test_update_profile_serializer.py
+│       │   ├── test_update_profile_view.py
 │       │   └── test_user_model.py
 │       ├── urls.py
 │       ├── utils.py
@@ -417,7 +426,16 @@ You can inspect the database on this address:
 │   │   │   │   ├── NavbarDrawer.tsx
 │   │   │   │   └── UserMenu.tsx
 │   │   │   ├── Navbar.tsx
-│   │   │   └── PageMessages.tsx
+│   │   │   ├── PageMessages.tsx
+│   │   │   ├── profile
+│   │   │   │   ├── ChangePasswordDialog.tsx
+│   │   │   │   ├── DeleteAccountDialog.tsx
+│   │   │   │   ├── DesktopProfileCard.tsx
+│   │   │   │   ├── EditDialog.tsx
+│   │   │   │   ├── MobileProfileCard.tsx
+│   │   │   │   ├── ProfileActivityPanel.tsx
+│   │   │   │   └── ProfileContent.tsx
+│   │   │   └── ProfileLayout.tsx
 │   │   ├── constants
 │   │   │   ├── base-urls.ts
 │   │   │   ├── endpoints.ts
@@ -440,22 +458,35 @@ You can inspect the database on this address:
 │   │   │   ├── Students.tsx
 │   │   │   └── Teachers.tsx
 │   │   ├── services
-│   │   │   └── api.ts
+│   │   │   ├── api.ts
+│   │   │   └── profileService.ts
 │   │   ├── __tests__
 │   │   │   ├── AlertMessages.test.tsx
 │   │   │   ├── AuthInterceptor.test.tsx
+│   │   │   ├── ChangePasswordDialog.test.tsx
+│   │   │   ├── DeleteAccountDialog.test.tsx
+│   │   │   ├── DesktopProfileCard.test.tsx
+│   │   │   ├── EditDialog.test.tsx
+│   │   │   ├── formatDate.test.tsx
 │   │   │   ├── FormComponent.test.tsx
 │   │   │   ├── LoginInput.test.tsx
 │   │   │   ├── LoginPage.test.tsx
+│   │   │   ├── MobileProfileCard.test.tsx
+│   │   │   ├── MyProfile.test.tsx
 │   │   │   ├── NavbarDrawer.test.tsx
 │   │   │   ├── Navbar.test.tsx
 │   │   │   ├── NoPage.test.tsx
 │   │   │   ├── PageMessages.test.tsx
+│   │   │   ├── ProfileActivityPanel.test.tsx
+│   │   │   ├── ProfileContent.test.tsx
+│   │   │   ├── ProfileLayout.test.tsx
+│   │   │   ├── profileService.test.tsx
 │   │   │   ├── RegisterInput.test.tsx
 │   │   │   ├── RegisterPage.test.tsx
 │   │   │   ├── Title.test.tsx
 │   │   │   ├── useAccessTokenHook.test.tsx
-│   │   │   └── UserMenu.test.tsx
+│   │   │   ├── UserMenu.test.tsx
+│   │   │   └── UserProviderContext.test.tsx
 │   │   ├── themes
 │   │   │   ├── colors.tsx
 │   │   │   ├── fonts.ts
@@ -463,6 +494,7 @@ You can inspect the database on this address:
 │   │   ├── @types
 │   │   │   └── fonts.d.ts
 │   │   ├── utils
+│   │   │   ├── formatDate.ts
 │   │   │   └── title.ts
 │   │   └── vite-env.d.ts
 │   ├── tsconfig.app.json
@@ -470,6 +502,8 @@ You can inspect the database on this address:
 │   ├── tsconfig.node.json
 │   ├── vite.config.ts
 │   └── vitest.config.ts
+├── package.json
+├── package-lock.json
 ├── README.md
 └── requirements.txt
 ```
@@ -502,10 +536,10 @@ You can inspect the database on this address:
 
 ---
 ## Test Coverage
-This is a Test Driven Development (TDD), you can check tests on actions tab of this project.
-- **Front-end (React):** 82 tests, 76.69% coverage (Vitest V8 – 86%+ on tested files). Details: [frontend.txt](coverages/frontend.txt)
-- **Back-end (Django):** 79 tests, 98% coverage (coverage.py). Details: [backend.txt](coverages/backend.txt)
-- **Total:** 136 tests – full-stack functional coverage exceeds 90%.
+This project follows Test-Driven Development (TDD). You can check test results in the Actions tab of this repository.
+- **Front-end (React):** 182 tests, 86.22% coverage (Vitest with V8). Fully tested files achieve 95-100% coverage, while untested placeholder pages (e.g., `CreateQuiz.tsx`, `Faq.tsx`) and theme files lower the overall rate. Details: [frontend.txt](coverages/frontend.txt)
+- **Back-end (Django):** 79 tests, 98% coverage (coverage.py). Comprehensive tests cover models, serializers, views, and utilities, with minor uncovered edge cases in `serializers.py` and `views.py`. Details: [backend.txt](coverages/backend.txt)
+- **Total:** 261 frontend + backend tests, with full-stack functional coverage exceeding 90% for implemented features.
 - **Note:** Coverage reports are generated by CI and stored in the repository – see `./coverage/` directory of this repository for details.
 
 November 2024

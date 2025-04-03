@@ -29,10 +29,12 @@
   "devDependencies": {
     "@eslint/js": "^9.13.0",
     "@testing-library/react": "^16.0.1",
+    "@types/css-mediaquery": "^0.1.4",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "@vitest/coverage-v8": "^2.1.9",
+    "css-mediaquery": "^0.1.2",
     "eslint": "^9.13.0",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.14",

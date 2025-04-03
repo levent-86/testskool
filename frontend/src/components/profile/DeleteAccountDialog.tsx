@@ -62,6 +62,7 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
         handleClose();
         setPasswordMessage(null);
         setAccess(null);
+        setIsButtonLoading(false);
       }
 
 
@@ -92,6 +93,7 @@ export const DeleteDialog: React.FC<DeleteTypes> = ({ open, handleClose }) => {
       setPassword('');
       setPasswordMessage(null);
       setIsButtonLoading(false);
+      setShowPassword(false);
     };
   }, [open]);
 

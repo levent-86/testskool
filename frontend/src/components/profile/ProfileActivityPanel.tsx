@@ -9,6 +9,7 @@ export const ProfileActivityPanel: React.FC = () => {
 
   return <>
     <Paper
+      data-testid="activity-panel-paper"
       elevation={5}
       sx={{
         display: 'flex',

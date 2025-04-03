@@ -69,6 +69,7 @@ const DesktopProfileCard: React.FC<ProfileCardProps> = ({ page }) => {
     }
 
     <Paper
+      data-testid="profile-card-paper"
       elevation={3}
       sx={{
         display: 'flex',

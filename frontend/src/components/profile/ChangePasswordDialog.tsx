@@ -193,7 +193,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordTypes> = ({ open, hand
                   <InputAdornment position="end">
                     <IconButton
                       aria-label={
-                        showPassword ? 'hide the password' : 'display the password'
+                        showPassword ? 'hide the password' : 'display new password'
                       }
                       onClick={handleShowHidePassword}
                       onMouseDown={handleMouseDownPassword}
@@ -216,13 +216,13 @@ export const ChangePasswordDialog: React.FC<ChangePasswordTypes> = ({ open, hand
                 value={confirmPassword}
                 onChange={handleConfirmPassword}
                 type={showConfirmPassword ? 'text' : 'password'}
-                placeholder="Min. 8 characters"
+                placeholder="New password confirmation"
                 inputProps={{ minLength: 8 }}
                 endAdornment={
                   <InputAdornment position="end">
                     <IconButton
                       aria-label={
-                        showConfirmPassword ? 'hide the password' : 'display the password'
+                        showConfirmPassword ? 'hide the password' : 'display confirmation'
                       }
                       onClick={handleShowHideConfirmPassword}
                       onMouseDown={handleMouseDownPassword}
@@ -242,7 +242,7 @@ export const ChangePasswordDialog: React.FC<ChangePasswordTypes> = ({ open, hand
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" disabled={isButtonLoading}>
             {
-              isButtonLoading ? <CircularProgress size={25} /> : 'Save Changes'
+              isButtonLoading ? <CircularProgress size={25} /> : 'Change Password'
             }
           </Button>
         </DialogActions>

@@ -243,6 +243,8 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
                 alt='Preview of selected image.'
                 sx={{ width: '80px', height: '80px' }}
                 aria-describedby='avatar-helper-text'
+                role='img'
+                data-testid='avatar-preview'
               />
               <FormHelperText id='avatar-helper-text-size'>Maximum 300 KB</FormHelperText>
               <FormHelperText id='avatar-helper-text-type'>(jpeg, png, gif)</FormHelperText>
@@ -252,7 +254,6 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
             {/* Profile picture */}
             <Button
               component="label"
-              role={undefined}
               variant="contained"
               tabIndex={-1}
               startIcon={<AddPhotoAlternateIcon />}
@@ -265,14 +266,37 @@ export const EditDialog: React.FC<EditTypes> = ({ open, handleClose }) => {
               />
             </Button>
 
-            <TextField label="First Name" variant="filled" value={first_name} onChange={handleFirstName} fullWidth />
-            <TextField label="Last Name" variant="filled" value={last_name} onChange={handleLastName} fullWidth />
-            <TextField label="About" variant="filled" value={about} onChange={handleAbout} fullWidth multiline />
+            <TextField
+              label="First Name"
+              variant="filled"
+              value={first_name}
+              placeholder='Your First Name'
+              onChange={handleFirstName}
+              fullWidth />
+
+            <TextField
+              label="Last Name"
+              variant="filled"
+              value={last_name}
+              placeholder='Your Last Name'
+              onChange={handleLastName}
+              fullWidth />
+
+            <TextField
+              label="About"
+              variant="filled"
+              value={about}
+              placeholder='About You'
+              onChange={handleAbout}
+              fullWidth
+              multiline />
+
             <FormHelperText error={true}>{aboutMessage}</FormHelperText>
             {
               userData.is_teacher && (
                 isSubjectsLoading ? (
-                  <Skeleton data-testid='skeleton' variant="rectangular" height={60} />) :
+                  <Skeleton data-testid='skeleton' variant="rectangular" height={60} />
+                ) :
                   <FormControl variant="filled">
                     <InputLabel id="subjects">Subject(s)</InputLabel>
                     <Select<string[]>
